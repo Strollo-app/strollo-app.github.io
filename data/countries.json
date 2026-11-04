@@ -82,5 +82,22 @@
     "desc": "El Reichstag, la Puerta de Brandeburgo, la Isla de los Museos, el Muro y el Kreuzberg alternativo."
    }
   ]
+ },
+ {
+  "id": "hu",
+  "name": "Hungría",
+  "file": "data/hu.json",
+  "photo": "Fisherman's Bastion, Budapest, Hungary.jpg",
+  "desc": "El Danubio, castillos, baños termales y paprika.",
+  "cities": [
+   {
+    "id": "budapest",
+    "name": "Budapest",
+    "routes": 3,
+    "stops": 15,
+    "photo": "Parliament Building and Cruise Boat along Danube River at Sunset - From Buda Side - Budapest - Hungary.jpg",
+    "desc": "El Castillo de Buda, el Parlamento, el barrio judío, la avenida Andrássy y los baños termales."
+   }
+  ]
  }
 ]
