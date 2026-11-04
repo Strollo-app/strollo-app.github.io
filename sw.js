@@ -9,6 +9,13 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   const isPage = req.mode === 'navigate' || url.pathname.endsWith('/') || url.pathname.endsWith('index.html');
+  const isData = url.origin === location.origin && url.pathname.includes('/data/');
+
+  if (isData) {
+    // Datos de países: red primero (para recibir rutas nuevas) y caché si no hay conexión.
+    e.respondWith(fetch(req).then(r => { const copy = r.clone(); caches.open(CACHE).then(c => c.put(req, copy)); return r; }).catch(() => caches.match(req, { ignoreSearch: true })));
+    return;
+  }
 
   if (isPage) {
     // Red primero para recibir actualizaciones; caché si no hay conexión.
