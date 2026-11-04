@@ -65,5 +65,22 @@
     "desc": "Alfama y el castillo, la Baixa del terremoto, el Chiado de Pessoa y los monumentos de Belém."
    }
   ]
+ },
+ {
+  "id": "de",
+  "name": "Alemania",
+  "file": "data/de.json",
+  "photo": "Brandenburger Tor abends.jpg",
+  "desc": "Historia del siglo XX, museos, muro y currywurst.",
+  "cities": [
+   {
+    "id": "berlin",
+    "name": "Berlín",
+    "routes": 3,
+    "stops": 15,
+    "photo": "Fernsehturm, Alexanderplatz, Berlin.jpg",
+    "desc": "El Reichstag, la Puerta de Brandeburgo, la Isla de los Museos, el Muro y el Kreuzberg alternativo."
+   }
+  ]
  }
 ]
