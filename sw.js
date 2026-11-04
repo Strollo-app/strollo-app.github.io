@@ -22,7 +22,7 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  if (url.pathname.includes('/audio/') || url.hostname === 'cdnjs.cloudflare.com' || url.hostname.endsWith('gstatic.com') || url.hostname === 'fonts.googleapis.com' || url.hostname === 'upload.wikimedia.org') {
+  if (url.pathname.includes('/audio/') || url.hostname === 'cdnjs.cloudflare.com' || url.hostname.endsWith('gstatic.com') || url.hostname === 'fonts.googleapis.com' || url.hostname === 'upload.wikimedia.org' || url.hostname === 'commons.wikimedia.org') {
     // Caché primero para audios, librerías y fuentes.
     e.respondWith(
       caches.match(req, { ignoreSearch: true }).then(hit => hit || fetch(req).then(r => {

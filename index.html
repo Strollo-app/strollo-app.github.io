@@ -829,7 +829,7 @@ main{padding-bottom:calc(var(--tabs) + var(--dock) + env(safe-area-inset-bottom,
 .sheet.on{transform:none;visibility:visible}
 .cover{position:relative;min-height:calc(250px + env(safe-area-inset-top,0px));color:var(--cover-ink);overflow:hidden;display:flex;align-items:flex-end}
 .cover .big{position:absolute;right:-20px;top:calc(30px + env(safe-area-inset-top,0px));width:190px;height:190px;opacity:.28;stroke-width:1.1}
-.cover .content{position:relative;z-index:2;width:100%;padding-block:0 22px}
+.cover .content{position:relative;z-index:3;width:100%;padding-block:0 22px}
 .cover h2{font-size:clamp(2rem,8.5vw,2.8rem);line-height:1;margin-top:6px;text-shadow:0 2px 12px rgba(0,0,0,.2)}
 .cover .tr{font-family:var(--f-mono);font-size:.78rem;opacity:.9;margin-top:6px}
 .cover .num{display:inline-flex;font-family:var(--f-mono);font-size:.75rem;font-weight:600;background:rgba(0,0,0,.25);border-radius:999px;padding:3px 10px}
@@ -986,11 +986,11 @@ details.script p{margin:.8em 0 0;max-width:65ch;color:var(--ink)}
 @media (max-width:380px){.rchip b{font-size:.68rem}}
 
 /* photos + nav */
-.thumb .ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+.thumb .ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
 .thumb .ph~.ico{opacity:0}
 .thumb .n,.thumb .done{z-index:3}
-.cover .ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
-.cover .ph-shade{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(0,0,0,.35) 0%,rgba(0,0,0,0) 35%,rgba(0,0,0,.65) 100%)}
+.cover .ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+.cover .ph-shade{position:absolute;inset:0;z-index:2;background:linear-gradient(180deg,rgba(0,0,0,.35) 0%,rgba(0,0,0,0) 35%,rgba(0,0,0,.65) 100%)}
 .cover .ph~.ph-shade~.big,.cover .ph~.big{display:none}
 .cover .credit{position:absolute;right:8px;bottom:6px;z-index:3;font-size:.6rem;color:rgba(255,255,255,.85);text-decoration:none;max-width:70%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .navpanel{position:absolute;left:10px;right:10px;top:10px;z-index:600;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.3);overflow:hidden}
@@ -1531,6 +1531,10 @@ $('#recenter').onclick=()=>{if(nav){nav.follow=true;$('#recenter').hidden=true;i
 const PH={"iskele": [["tr", "Kadıköy İskelesi"]], "haydarpasa": [["en", "Haydarpaşa railway station"], ["tr", "Haydarpaşa Garı"]], "yeldegirmeni": [["tr", "Yeldeğirmeni, Kadıköy"], ["en", "Yeldeğirmeni"]], "takavor": [["en", "Surp Takavor Church"], ["tr", "Surp Takavor Ermeni Kilisesi"]], "efimia": [["tr", "Aya Efimia Kilisesi"], ["tr", "Aya Efimia Rum Ortodoks Kilisesi"]], "carsi": [["tr", "Kadıköy Çarşısı"], ["tr", "Kadıköy Balık Pazarı"]], "akmar": [["tr", "Akmar Pasajı"]], "boga": [["tr", "Boğa Heykeli (Kadıköy)"], ["tr", "Kadıköy Boğa Heykeli"], ["en", "Kadıköy Bull Statue"]], "opera": [["en", "Süreyya Opera House"], ["tr", "Süreyya Operası"]], "kadife": [["tr", "Kadife Sokak"]], "baylan": [["tr", "Baylan Pastanesi"]], "moda": [["en", "Moda, Kadıköy"], ["tr", "Moda, Kadıköy"]], "modaiskele": [["tr", "Moda İskelesi"]], "burnu": [["tr", "Moda Burnu"], ["tr", "Moda Parkı"]], "fener": [["en", "Şükrü Saracoğlu Stadium"], ["tr", "Şükrü Saracoğlu Stadyumu"]], "hipodromo": [["en", "Hippodrome of Constantinople"], ["en", "Obelisk of Theodosius"]], "azul": [["en", "Sultan Ahmed Mosque"], ["es", "Mezquita Azul"]], "cisterna": [["en", "Basilica Cistern"], ["es", "Cisterna Basílica"]], "sofia": [["en", "Hagia Sophia"], ["es", "Santa Sofía"]], "topkapi": [["en", "Topkapı Palace"]], "gulhane": [["en", "Gülhane Park"]], "cemberlitas": [["en", "Column of Constantine"]], "granbazar": [["en", "Grand Bazaar, Istanbul"]], "suleymaniye": [["en", "Süleymaniye Mosque"]], "rustem": [["en", "Rüstem Pasha Mosque"]], "especias": [["en", "Spice Bazaar"]], "yenicami": [["en", "New Mosque, Istanbul"], ["en", "New Mosque (Istanbul)"]], "eminonu": [["en", "Eminönü"]], "puente": [["en", "Galata Bridge"]], "karakoy": [["en", "Karaköy"]], "bankalar": [["en", "Bankalar Caddesi"], ["en", "SALT Galata"]], "kamondo": [["en", "Camondo Stairs"]], "torre": [["en", "Galata Tower"]], "mevlevi": [["en", "Galata Mevlevi House Museum"], ["tr", "Galata Mevlevihanesi"]], "tunel": [["en", "Tünel"]]};
 let photos=store.get('kdk-photos',{});
 const savePhotos=()=>store.set('kdk-photos',photos);
+const FIXPH={"iskele": "ŞH Kadıköy.jpg", "haydarpasa": "Haydarpaşa Terminal.JPG", "efimia": "Sancte Euphemia Kadıköy.jpg", "carsi": "Kadıköy Fish Market (6418934547).jpg", "boga": "Bull Statue in Kadıköy 20210127.jpg", "opera": "Süreyya Opera House in Istanbul, Turkey.jpg", "kadife": "Arka oda Kadikoy.jpg", "moda": "İstanbul - Kadıköy, Moda r4- Mart 2013.JPG", "burnu": "Moda sahili - panoramio.jpg", "fener": "Istanbul Şükrü Saracoğlu Stadium 2.jpg", "hipodromo": "Hippodrome of Constantinople and Obelisk of Theodosius on Sultanahmet Meydanı square (8396071658).jpg", "azul": "Exterior of Sultan Ahmed I Mosque in Istanbul, Turkey 002.jpg", "cisterna": "Basilica Cistern Istanbul.JPG", "sofia": "Hagia Sophia Mars 2013.jpg", "topkapi": "Gate of Felicity (Topkapı Palace).jpg", "gulhane": "Gülhane Park, Istanbul.jpg", "cemberlitas": "The Column of Constantine in Çemberlitaş (14482593638).jpg", "granbazar": "Istanbul.GrandBazaar003.jpg", "suleymaniye": "Süleymaniye Mosque, Istanbul.jpg", "rustem": "Rüstem Pasha mosque tiles.jpg", "especias": "Spice Bazaar -1.jpg", "yenicami": "The New Mosque (Yeni Cami) (8393797619).jpg", "eminonu": "Balik ekmek Galata Bridge.JPG", "puente": "Fishermen on Galata Bridge.JPG", "karakoy": "Karaköy balık pazarı.jpg", "bankalar": "Eski Osmanlı Bankası binası, 2023 03.jpg", "kamondo": "İstanbul - Kamondo Merdivenleri - Mart 2013.JPG", "torre": "Galata Tower of Istanbul.jpg", "mevlevi": "Galata Mevlevihanesi, semahane 8354 Nevit.jpg", "tunel": "Istanbul asv2020-02 img04 Tünel Beyoğlu station.jpg"};
+(function(){const enc=f=>encodeURIComponent(f.replace(/ /g,'_'));
+  Object.entries(FIXPH).forEach(([id,f])=>{photos[id]={big:`https://commons.wikimedia.org/wiki/Special:FilePath/${enc(f)}?width=1000`,small:`https://commons.wikimedia.org/wiki/Special:FilePath/${enc(f)}?width=320`,credit:'Wikimedia Commons',lic:'ver autor y licencia',link:'https://commons.wikimedia.org/wiki/File:'+enc(f)}})})();
+
 const stripTags=t=>{const d=document.createElement('div');d.innerHTML=t||'';return (d.textContent||'').trim().replace(/\s+/g,' ')};
 async function findPhoto(id){
   if(photos[id]!==undefined)return photos[id];
