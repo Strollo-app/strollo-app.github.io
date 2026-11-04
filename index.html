@@ -1084,6 +1084,7 @@ button.go{border:0;background:transparent;cursor:pointer;padding:2px 0;font:inhe
 .phrase b{font-weight:600}
 .phrase .say{font-family:var(--f-mono);font-size:.74rem;color:var(--cay)}
 .phrase .es{grid-row:span 2;color:var(--muted);font-size:.88rem;text-align:right}
+.phrase.long{grid-template-columns:auto 1fr}.phrase.long .es{grid-row:auto;grid-column:2;text-align:left}.phrase.long .say{grid-column:2;font-family:inherit;font-style:italic;font-size:.85rem}.phrase.long .say-btn{grid-row:span 3}
 .kv{display:grid;gap:12px}
 .kv > div{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:start}
 .kv i{width:34px;height:34px;border-radius:10px;background:var(--raise);display:grid;place-items:center;color:var(--sea-2)}
@@ -1239,7 +1240,7 @@ button.go{border:0;background:transparent;cursor:pointer;padding:2px 0;font:inhe
    <div class="segpane" id="seg-gf" hidden>
     <div class="card gfhero">
      <div class="gfbadge">GF</div>
-     <div><h2>Sin gluten en Estambul</h2><p>Contrastado en Find Me Gluten Free, Atly, Nerede Glutensiz, guías locales y reseñas de celíacos. Los sitios cambian: confirmad siempre al llegar.</p></div>
+     <div><h2 id="gfHeroTitle">Sin gluten</h2><p id="gfHeroText">Contrastado en webs de celíacos, guías locales y reseñas. Los sitios cambian: confirmad siempre al llegar.</p></div>
     </div>
     <div class="legend">
      <span><i class="lv lv1"></i>100 % sin gluten</span>
@@ -1253,14 +1254,15 @@ button.go{border:0;background:transparent;cursor:pointer;padding:2px 0;font:inhe
     <div class="sec-title"><h2>Bares y bebida</h2></div>
     <div class="card block"><div class="kv" id="gfdrinks"></div></div>
 
-    <div class="sec-title"><h2>Ojo con la comida turca</h2></div>
+    <div class="sec-title"><h2 id="gfWarnTitle">Ojo con la comida local</h2></div>
     <div class="card block"><div class="kv" id="gfwarn"></div></div>
 
-    <div class="sec-title"><h2>Tarjeta para el camarero</h2><span class="eyebrow">Enséñala</span></div>
+    <div id="gfCardSec"><div class="sec-title"><h2>Tarjeta para el camarero</h2><span class="eyebrow">Enséñala</span></div>
     <div class="card gfcard">
      <p lang="tr" id="gfCardTr">Çölyak hastasıyım. Buğday, arpa ve çavdar içeren hiçbir şey yiyemem: ekmek, un, bulgur, yufka, şehriye, galeta unu ve bira dahil. Yemeğimin temiz tavada veya temiz ızgarada hazırlanmasını ve ekmekle temas etmemesini rica ederim. Teşekkür ederim!</p>
      <p class="es" id="gfCardEs">Soy celíaco/a. No puedo comer nada con trigo, cebada ni centeno: pan, harina, bulgur, masa yufka, fideos, pan rallado ni cerveza. Por favor, preparad mi plato en una sartén o parrilla limpia y sin que toque el pan. ¡Gracias!</p>
      <div class="chips"><button class="chip primary" id="sayCard"><svg class="ico"><use href="#i-speaker"/></svg>Escuchar en turco</button><button class="chip" id="copyCard">Copiar el texto en turco</button></div>
+    </div>
     </div>
     <div class="phrases" id="gfphrases"></div>
    </div>
@@ -1289,13 +1291,13 @@ button.go{border:0;background:transparent;cursor:pointer;padding:2px 0;font:inhe
    <div class="card block" id="ferries"></div>
    <div class="sec-title"><h2>Ayuda y emergencias</h2></div>
    <div class="card block"><div class="kv" id="help"></div></div>
-   <div class="sec-title"><h2>Frases útiles</h2><span class="eyebrow">Toca el altavoz</span></div>
+   <div class="sec-title"><h2 id="phrTitle">Frases útiles</h2><span class="eyebrow" id="phrEyebrow">Toca el altavoz</span></div>
    <div class="phrases" id="phrases"></div>
    <div class="sec-title"><h2 id="tlTitle">Historia</h2></div>
    <div class="card block"><ol class="timeline" id="timeline"></ol></div>
    <div class="sec-title"><h2>Práctico</h2></div>
    <div class="card block"><div class="kv" id="practical"></div></div>
-   <p class="foot">Strollo · audioguía del viaje del grupo a Estambul, del 2 al 9 de noviembre de 2026. Las paradas marcadas se guardan solo en tu móvil. Horarios y precios pueden cambiar.</p>
+   <p class="foot" id="footNote">Strollo · audioguía de viaje. Las paradas marcadas se guardan solo en tu móvil. Horarios y precios pueden cambiar.</p>
   </div></div>
  </section>
 </main>
@@ -1375,7 +1377,7 @@ function renderRoute(){
   $('#introCard').innerHTML=`<div class="art">${ico('headphones')}</div><div><b>${esc(R.intro.name)}</b><span>${fmt(R.intro.dur)} · ${esc(R.intro.hint)}</span></div><button class="pbtn" data-play="${R.intro.id}" aria-label="Escuchar la introducción">${ico('play')}</button>`;
   const t=todayISO();
   $('#alerts').innerHTML=R.alerts.filter(a=>!a.day||a.day===t).map(a=>`<div class="card alert${a.hot?' today':''}"><div class="badge">${ico(a.icon)}</div><p><strong>${esc(a.t)}</strong>${esc(a.d)}</p></div>`).join('')+
-    `<a class="card alert" href="#singluten" style="text-decoration:none;border-color:var(--ok)"><div class="badge" style="background:var(--ok-soft);color:var(--ok);font:600 .8rem var(--f-mono)">GF</div><p><strong>Sin gluten</strong>Sitios seguros en cada zona y una tarjeta en turco para el camarero.</p></a>`;
+    `<a class="card alert" href="#singluten" style="text-decoration:none;border-color:var(--ok)"><div class="badge" style="background:var(--ok-soft);color:var(--ok);font:600 .8rem var(--f-mono)">GF</div><p><strong>Sin gluten</strong>${esc(CO.gf.alertText||'Sitios seguros en cada zona y qué platos vigilar.')}</p></a>`;
   $('#plan').innerHTML=R.plan.map(p=>`<div class="card slot"><span class="t">${p[0]}</span><b>${esc(p[1])}</b><span>${esc(p[2])}</span></div>`).join('');
   renderList();bindPlay($('#v-ruta'));setUI();
 }
@@ -1749,7 +1751,8 @@ let geo=store.get('kdk-geo',{});const saveGeo=()=>store.set('kdk-geo',geo);
 const ZBOX=CI.zbox||{};
 const ZCENTER=CI.zcenter||{};
 function eateries(z){const m=new Map();PLACES.filter(p=>p.zone===z).forEach(p=>m.set(p.q,{n:p.n,q:p.q,d:p.d,z:p.z,gf:p.gf?2:0,zone:p.zone}));GF.filter(p=>p.zone===z&&p.i!=='alert').forEach(p=>{const e=m.get(p.q);if(e)e.gf=p.l;else m.set(p.q,{n:p.n,q:p.q,d:p.d,z:p.z,gf:p.l,zone:p.zone})});return [...m.values()]}
-function knownLL(e){if(AT[e.n]&&byId[AT[e.n]]){const s=byId[AT[e.n]];const k=e.n.length%5;return [s.lat+0.00012*(k-2),s.lng+0.00015*(k-2)]}return geo[e.q]}
+let LLQ=null;
+function knownLL(e){if(!LLQ){LLQ={};[...PLACES,...GF].forEach(p=>{if(p.ll)LLQ[p.q]=p.ll})}if(LLQ[e.q])return LLQ[e.q];if(AT[e.n]&&byId[AT[e.n]]){const s=byId[AT[e.n]];const k=e.n.length%5;return [s.lat+0.00012*(k-2),s.lng+0.00015*(k-2)]}return geo[e.q]}
 async function geocode(e){
   const ctl=new AbortController();const to=setTimeout(()=>ctl.abort(),6000);
   try{const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&accept-language=es&bounded=1&viewbox=${ZBOX[e.zone]}&q=${encodeURIComponent(e.q)}`,{signal:ctl.signal});
@@ -1819,7 +1822,7 @@ function sayTr(t,btn){const f=TR[t];if(!f)return;if(!audio.paused)audio.pause();
   sayA=new Audio(f);sayBtn=btn;btn.classList.add('on');
   sayA.onended=sayA.onerror=()=>btn.classList.remove('on');
   sayA.play().catch(()=>btn.classList.remove('on'))}
-const sayHTML=t=>TR[t]?`<button class="say-btn" data-say="${esc(t)}" aria-label="Escuchar «${esc(t)}» en turco">${ico('speaker')}</button>`:'';
+const sayHTML=t=>TR[t]?`<button class="say-btn" data-say="${esc(t)}" aria-label="Escuchar «${esc(t)}» en ${esc(CO.langName||'')}">${ico('speaker')}</button>`:'';
 function bindSay(root){root.querySelectorAll('[data-say]').forEach(b=>b.onclick=()=>sayTr(b.dataset.say,b))}
 
 /* ---------- FOOD ---------- */
@@ -1840,6 +1843,7 @@ function renderFood(){
   const LVL={1:"100 % sin gluten",2:"Menú sin gluten",3:"Opciones · precaución"};
   $('#gfplaces').innerHTML=GF.filter(p=>p.zone===zone).map(p=>`<div class="card place${p.far?' far':''}"><div class="art" style="background:${p.l===1?'var(--ok)':p.l===2?'var(--sea-2)':'var(--cay)'}">${ico(p.i)}</div><div style="min-width:0"><span class="gflevel l${p.l}">${LVL[p.l]}</span><div class="row"><b>${esc(p.n)}</b><button class="go" data-onmap="${esc(p.q)}" data-zone="${p.zone}">${ico('map')}Ver en el mapa</button></div><div class="mono" style="font-size:.7rem;color:var(--muted)">${esc(p.z)}</div><p>${esc(p.d)}</p><p class="note">${esc(p.note)}</p><a class="gmaps" href="${mapsQ(p.q)}" target="_blank" rel="noopener">Abrir en Google Maps ↗</a></div></div>`).join('');
   $$('[data-onmap]').forEach(b=>b.onclick=()=>showOnMap(b.dataset.onmap,b.dataset.zone));
+  if(!GF.some(p=>p.zone===zone))$('#gfplaces').innerHTML='<div class="card block"><p style="margin:0;color:var(--muted)">No hemos encontrado sitios sin gluten fiables en esta zona. Mirad las otras zonas: están a pocos minutos.</p></div>';
   $('#gfZoneTitle').textContent='Sin gluten · '+ZONES.find(z=>z[0]===zone)[1];
 }
 const GFD=CO.gf.drinks;
@@ -1848,22 +1852,22 @@ $('#gfdrinks').innerHTML=GFD.map(p=>`<div><i>${ico(p[0])}</i><div><b>${esc(p[1])
 $('#gfwarn').innerHTML=GFW.map(p=>`<div><i style="${p[0]==='check'?'color:var(--ok)':'color:var(--cay)'}">${ico(p[0])}</i><div><b>${esc(p[1])}</b><span>${esc(p[2])}</span></div></div>`).join('');
 const GFP=CO.gf.phrases;
 $('#gfphrases').innerHTML=GFP.map(p=>`<div class="card phrase">${sayHTML(p[0])}<b>${esc(p[0])}</b><span class="es">${esc(p[2])}</span><span class="say">${esc(p[1])}</span></div>`).join('');
-$('#gfCardTr').textContent=CO.gf.card.local;$('#gfCardTr').lang=CO.lang;$('#gfCardEs').textContent=CO.gf.card.es;$('#sayCard').lastChild.textContent='Escuchar en '+CO.langName;$('#copyCard').textContent='Copiar el texto en '+CO.langName;
+if(CO.gf.card){$('#gfCardTr').textContent=CO.gf.card.local;$('#gfCardTr').lang=CO.lang;$('#gfCardEs').textContent=CO.gf.card.es;$('#sayCard').lastChild.textContent='Escuchar en '+CO.langName;$('#copyCard').textContent='Copiar el texto en '+CO.langName;
 $('#copyCard').onclick=async()=>{const t=$('#gfCardTr').textContent;try{await navigator.clipboard.writeText(t);$('#copyCard').textContent='Copiado'}catch(e){const r=document.createRange();r.selectNodeContents($('#gfCardTr'));const s=getSelection();s.removeAllRanges();s.addRange(r);$('#copyCard').textContent='Texto seleccionado: cópialo'}setTimeout(()=>$('#copyCard').textContent='Copiar el texto en '+CO.langName,2500)};
-$('#sayCard').onclick=()=>sayTr($('#gfCardTr').textContent.trim(),$('#sayCard'));
+$('#sayCard').onclick=()=>sayTr($('#gfCardTr').textContent.trim(),$('#sayCard'));}else{$('#gfCardSec').hidden=true}
 function showSeg(k){$$('.seg [data-seg]').forEach(b=>b.setAttribute('aria-selected',b.dataset.seg===k));$$('.segpane').forEach(p=>p.hidden=p.id!=='seg-'+k);window.scrollTo(0,0)}
 $$('.seg [data-seg]').forEach(b=>b.onclick=()=>showSeg(b.dataset.seg));
 const DISHES=CO.dishes||[];
-const CATS=['Todo','Calle','Platos','Dulces','Bebidas'];let cat='Todo';
+const CATS=['Todo',...new Set(DISHES.map(d=>d[3]))];let cat='Todo';
 function renderDict(){
   $('#filters').innerHTML=CATS.map(c=>`<button aria-pressed="${c===cat}" data-cat="${c}">${c}</button>`).join('');
   $$('#filters [data-cat]').forEach(b=>b.onclick=()=>{cat=b.dataset.cat;renderDict()});
-  $('#dict').innerHTML=DISHES.filter(d=>cat==='Todo'||d[3]===cat).map(d=>`<div class="card dish"><b>${esc(d[0])}</b><span class="say">${esc(d[1])}</span><p>${esc(d[2])}</p></div>`).join('');
+  $('#dict').innerHTML=DISHES.filter(d=>cat==='Todo'||d[3]===cat).map(d=>`<div class="card dish"><b>${esc(d[0])}</b>${d[1]?`<span class="say">${esc(d[1])}</span>`:''}<p>${esc(d[2])}</p></div>`).join('');
 }
 
 /* ---------- INFO ---------- */
-const PHR=CO.phrases||[];
-$('#phrases').innerHTML=PHR.map(p=>`<div class="card phrase">${sayHTML(p[0])}<b>${esc(p[0])}</b><span class="es">${esc(p[2])}</span><span class="say">${esc(p[1])}</span></div>`).join('');
+const PHR=CO.phrases||[];$('#gfHeroTitle').textContent='Sin gluten en '+CI.name;if(CO.gf.sources)$('#gfHeroText').textContent=CO.gf.sources;$('#phrTitle').textContent=CO.phrasesTitle||'Frases útiles';$('#phrEyebrow').textContent=CO.phrasesEyebrow||'Toca el altavoz';if(CO.gf.warnTitle)$('#gfWarnTitle').textContent=CO.gf.warnTitle;
+$('#phrases').innerHTML=PHR.map(p=>`<div class="card phrase${CO.phrasesTitle?' long':''}">${sayHTML(p[0])}<b>${esc(p[0])}</b><span class="es">${esc(p[2])}</span><span class="say">${esc(p[1])}</span></div>`).join('');
 const TL=CI.timeline.items;
 $('#timeline').innerHTML=TL.map((t,i)=>`<li class="${i===TL.length-1?'now':''}"><span class="y">${t[0]}</span><p>${esc(t[1])}</p></li>`).join('');
 const PR=CO.practical||[];
@@ -1965,7 +1969,7 @@ async function open(dest){
     started={c:CO.id,city:CI.id};hideHome();
     document.getElementById('cityName').textContent=CI.name+' · '+CO.name;
     startApp(CO,CI);
-  }catch(e){$('#countries').insertAdjacentHTML('afterbegin','<p class="empty">No se pudo cargar el destino. Revisa la conexión.</p>');showHome()}
+  }catch(e){console.error('Strollo',e);$('#countries').insertAdjacentHTML('afterbegin','<p class="empty">No se pudo cargar el destino. Revisa la conexión.</p>');showHome()}
 }
 document.getElementById('destBtn').onclick=()=>{location.hash='inicio'};
 addEventListener('hashchange',()=>{if(location.hash==='#inicio')showHome();else if(started)hideHome()});

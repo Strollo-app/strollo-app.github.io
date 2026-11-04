@@ -1,1 +1,36 @@
-[{"id": "tr", "name": "Turquía", "file": "data/tr.json", "photo": "Hagia Sophia Mars 2013.jpg", "desc": "Entre Europa y Asia: mezquitas, bazares, ferris y la mejor comida callejera.", "cities": [{"id": "istanbul", "name": "Estambul", "routes": 5, "stops": 41, "photo": "Istanbul City skyline at Sunset.jpg", "desc": "Dos continentes, un estrecho y quince siglos de historia: de los bazares de la ciudad vieja a los barrios vivos de la orilla asiática."}]}]
+[
+ {
+  "id": "tr",
+  "name": "Turquía",
+  "file": "data/tr.json",
+  "photo": "Hagia Sophia Mars 2013.jpg",
+  "desc": "Entre Europa y Asia: mezquitas, bazares, ferris y la mejor comida callejera.",
+  "cities": [
+   {
+    "id": "istanbul",
+    "name": "Estambul",
+    "routes": 5,
+    "stops": 41,
+    "photo": "Istanbul City skyline at Sunset.jpg",
+    "desc": "Dos continentes, un estrecho y quince siglos de historia: de los bazares de la ciudad vieja a los barrios vivos de la orilla asiática."
+   }
+  ]
+ },
+ {
+  "id": "es",
+  "name": "España",
+  "file": "data/es.json",
+  "photo": "Basilica del Pilar-sunset.jpg",
+  "desc": "Ciudades españolas con audioguía a pie.",
+  "cities": [
+   {
+    "id": "zaragoza",
+    "name": "Zaragoza",
+    "routes": 4,
+    "stops": 30,
+    "photo": "Zaragoza - Basílica del Pilar y río Ebro.jpg",
+    "desc": "El Pilar, La Seo, la Aljafería, la Zaragoza romana, las tapas de El Tubo y el Ebro."
+   }
+  ]
+ }
+]
