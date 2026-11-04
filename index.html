@@ -1337,6 +1337,7 @@ button.go{border:0;background:transparent;cursor:pointer;padding:2px 0;font:inhe
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 function startApp(CO,CI){
+if(CI.override){CO=Object.assign({},CO,CI.override);if(CI.override.say)CO.say=Object.assign({},CO.say||{},CI.override.say)}if(CI.helpExtra)CO.help=[...(CO.help||[]),...CI.helpExtra];if(CI.practicalExtra)CO.practical=[...(CO.practical||[]),...CI.practicalExtra];
 const ROUTES=CI.routes;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');

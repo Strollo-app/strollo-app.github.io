@@ -30,6 +30,14 @@
     "stops": 30,
     "photo": "Zaragoza - Basílica del Pilar y río Ebro.jpg",
     "desc": "El Pilar, La Seo, la Aljafería, la Zaragoza romana, las tapas de El Tubo y el Ebro."
+   },
+   {
+    "id": "albacete",
+    "name": "Albacete",
+    "routes": 2,
+    "stops": 12,
+    "photo": "Catedral de Albacete.jpg",
+    "desc": "Modernismo, navajas, la catedral de los cuatro siglos y la Feria con forma de sartén."
    }
   ]
  }
