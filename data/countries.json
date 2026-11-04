@@ -9,8 +9,8 @@
    {
     "id": "istanbul",
     "name": "Estambul",
-    "routes": 5,
-    "stops": 41,
+    "routes": 9,
+    "stops": 60,
     "photo": "Istanbul City skyline at Sunset.jpg",
     "desc": "Dos continentes, un estrecho y quince siglos de historia: de los bazares de la ciudad vieja a los barrios vivos de la orilla asiática."
    },
