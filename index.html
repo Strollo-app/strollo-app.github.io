@@ -863,6 +863,10 @@ main{padding-bottom:calc(var(--tabs) + var(--dock) + env(safe-area-inset-bottom,
 .duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
 .curio{background:var(--sea);color:var(--sea-ink);border:0}
 .curio h3{color:var(--stripe)}
+.moreplayer{border:1.5px dashed var(--line,#d9d2c3)}
+.mp-head{font:600 11px/1 var(--mono,monospace);letter-spacing:.08em;text-transform:uppercase;opacity:.7;margin-bottom:10px}
+.mp-head span{display:inline-flex;gap:6px;align-items:center}.mp-head .ico{width:14px;height:14px}
+.morecur ul{margin:0;padding-left:18px}.morecur li{margin:0 0 8px;line-height:1.45}
 .tipbox{background:var(--cay-soft);border-color:transparent}
 .tipbox h3{color:var(--cay)}
 .block p{margin:0}
@@ -1349,7 +1353,7 @@ const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.
 
 /* index everything */
 const byId={};const routeOf={};
-ROUTES.forEach(r=>{r.main=r.stops.filter(s=>!s.extra);byId[r.intro.id]=Object.assign(r.intro,{isIntro:true,hue:30,icon:'headphones'});routeOf[r.intro.id]=r;r.stops.forEach(s=>{byId[s.id]=s;routeOf[s.id]=r})});
+ROUTES.forEach(r=>{r.main=r.stops.filter(s=>!s.extra);byId[r.intro.id]=Object.assign(r.intro,{isIntro:true,hue:30,icon:'headphones'});routeOf[r.intro.id]=r;r.stops.forEach(s=>{byId[s.id]=s;routeOf[s.id]=r;if(s.more){const m={id:s.id+'-mas',file:s.more.file,dur:s.more.dur,isMore:true,parent:s,name:s.name,hue:s.hue,icon:s.icon};byId[m.id]=m;routeOf[m.id]=r}})});
 const routeById=Object.fromEntries(ROUTES.map(r=>[r.id,r]));
 let R=routeById[store.get('strollo-route-'+CI.id,CI.routes[0].id)]||ROUTES[0];
 const num=s=>s.extra?'+':String(routeOf[s.id].main.indexOf(s)+1);
@@ -1389,7 +1393,7 @@ function renderList(){
     return wl+`<li><button class="srow${done.has(s.id)?' is-done':''}" data-open="${s.id}">
       <div class="thumb">${coverBg(s)}<span class="n">${s.extra?'EXTRA':num(s)}</span>${ico(s.icon)}<span class="done">${ico('check')}</span></div>
       <div class="body"><b>${esc(s.name)}</b><span class="tr">${esc(s.tr)}</span>
-      <div class="meta"><span>${ico('headphones')}${fmt(s.dur)}</span>${qa!=null?`<span class="${qa?'qok':'qko'}">${ico(qa?'check':'alert')}Quiz</span>`:''}</div></div>
+      <div class="meta"><span>${ico('headphones')}${fmt(s.dur)}${s.more?' + '+fmt(s.more.dur):''}</span>${qa!=null?`<span class="${qa?'qok':'qko'}">${ico(qa?'check':'alert')}Quiz</span>`:''}</div></div>
     </button></li>`}).join('');
   $$('#list [data-open]').forEach(b=>b.onclick=()=>{location.hash='p-'+b.dataset.open});
   const n=R.main.filter(s=>done.has(s.id)).length;
@@ -1406,7 +1410,7 @@ function renderRouteChipsCounts(){$$('.rchip').forEach(b=>{const r=routeById[b.d
 /* ---------- SHEET ---------- */
 let sheetId=null;
 function openSheet(id){
-  const s=byId[id];if(!s||s.isIntro)return;sheetId=id;
+  let s=byId[id];if(s&&s.isMore){id=s.parent.id;s=s.parent}if(!s||s.isIntro)return;sheetId=id;
   const r=routeOf[id];if(r!==R)setRoute(r.id,true);
   const i=r.stops.indexOf(s),prev=r.stops[i-1],next=r.stops[i+1];
   const maps='https://www.google.com/maps/dir/?api=1&travelmode=walking&destination='+encodeURIComponent(s.maps);
@@ -1420,12 +1424,22 @@ function openSheet(id){
     <div class="card bigplayer">
       <div class="bp-row">
         <button class="pbtn" data-play="${s.id}" aria-label="Escuchar">${ico('play')}</button>
-        <div class="bp-info"><b>Audioguía</b><span class="bp-time">0:00 / ${fmt(s.dur)}</span></div>
-        <button class="skip" data-skip="-15" aria-label="Retroceder 15 segundos">−15</button>
-        <button class="skip" data-skip="15" aria-label="Avanzar 15 segundos">+15</button>
+        <div class="bp-info"><b>Audioguía</b><span class="bp-time" id="bpt-${s.id}">0:00 / ${fmt(s.dur)}</span></div>
+        <button class="skip" data-for="${s.id}" data-skip="-15" aria-label="Retroceder 15 segundos">−15</button>
+        <button class="skip" data-for="${s.id}" data-skip="15" aria-label="Avanzar 15 segundos">+15</button>
       </div>
       <input type="range" class="scrub" id="scrub-${s.id}" min="0" max="1000" value="0" aria-label="Posición del audio">
     </div>
+    ${s.more?`<div class="card bigplayer moreplayer">
+      <div class="mp-head"><span>${ico('headphones')}Para los que queréis más</span></div>
+      <div class="bp-row">
+        <button class="pbtn" data-play="${s.id}-mas" aria-label="Escuchar más historia">${ico('play')}</button>
+        <div class="bp-info"><b>Más historia</b><span class="bp-time" id="bpt-${s.id}-mas">0:00 / ${fmt(s.more.dur)}</span></div>
+        <button class="skip" data-for="${s.id}-mas" data-skip="-15" aria-label="Retroceder 15 segundos">−15</button>
+        <button class="skip" data-for="${s.id}-mas" data-skip="15" aria-label="Avanzar 15 segundos">+15</button>
+      </div>
+      <input type="range" class="scrub" id="scrub-${s.id}-mas" data-scrub="${s.id}-mas" min="0" max="1000" value="0" aria-label="Posición del audio de más historia">
+    </div>`:''}
     <div class="chips">
       <button class="chip primary" id="goBtn">${ico('route')}Llevarme aquí</button>
       <a class="chip" href="${maps}" target="_blank" rel="noopener">${ico('pin')}Google Maps</a>
@@ -1438,9 +1452,11 @@ function openSheet(id){
       <div class="card block curio"><h3>Curiosidad</h3><p>${esc(s.curio)}</p></div>
       <div class="card block tipbox"><h3>Consejo</h3><p>${esc(s.tip)}</p></div>
     </div>
+    ${s.more&&s.more.curios?`<div class="card block morecur"><h3>Más curiosidades</h3><ul>${s.more.curios.map(c=>`<li>${esc(c)}</li>`).join('')}</ul></div>`:''}
     ${s.q?`<div class="card block quiz" id="quizBox"><h3>Pregunta del grupo</h3><p class="qq">${esc(s.q[0])}</p><div class="qopts">${s.q[1].map((o,k)=>`<button data-ans="${k}" class="${qa!=null?(k===s.q[2]?'right':''):''}" ${qa!=null?'disabled':''}>${esc(o)}</button>`).join('')}</div><p class="qres">${qa==null?'Escuchad el audio y responded.':(qa?'¡Correcto!':'Fallaste. La buena está marcada en verde.')}</p></div>`:''}
     <div class="card block nextbox"><h3>${s.extra?'Cómo volver':(next&&!next.extra?'Hacia la parada '+num(next)+' · '+esc(next.name):'Final')}</h3><p class="gorow">${ico('walk')}<span>${esc(s.go||'')}${next&&!next.extra&&next.walk?' <b>≈ '+next.walk+' min.</b>':''}</span></p></div>
     <details class="card script"><summary>Leer el texto del audio ${ico('chev')}</summary>${s.text.split('\n\n').map(p=>'<p>'+esc(p)+'</p>').join('')}</details>
+    ${s.more&&s.more.text?`<details class="card script"><summary>Leer «Más historia» ${ico('chev')}</summary>${s.more.text.split('\n\n').map(p=>'<p>'+esc(p)+'</p>').join('')}</details>`:''}
     <div class="pager">
       <button ${prev?'':'disabled'} data-go="${prev?prev.id:''}"><span>Anterior</span><b>${prev?esc(prev.name):''}</b></button>
       <button ${next?'':'disabled'} data-go="${next?next.id:''}"><span>${next&&next.extra?'Extra':'Siguiente'}</span><b>${next?esc(next.name):''}</b></button>
@@ -1450,12 +1466,12 @@ function openSheet(id){
   $('#sBack').onclick=()=>{location.hash=lastTab||'ruta'};
   $('#doneBtn').onclick=()=>{done.has(id)?done.delete(id):done.add(id);saveDone();renderList();openSheet(id)};
   sh.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{if(b.dataset.go)location.hash='p-'+b.dataset.go});
-  sh.querySelectorAll('[data-skip]').forEach(b=>b.onclick=()=>{if(cur===id&&audio.src)audio.currentTime=Math.max(0,audio.currentTime+ +b.dataset.skip)});
+  sh.querySelectorAll('[data-skip]').forEach(b=>b.onclick=()=>{if(cur===b.dataset.for&&audio.src)audio.currentTime=Math.max(0,audio.currentTime+ +b.dataset.skip)});
   sh.querySelectorAll('[data-ans]').forEach(b=>b.onclick=()=>{const k=+b.dataset.ans,ok=k===s.q[2];quiz[id]=ok;saveQuiz();
     sh.querySelectorAll('[data-ans]').forEach(x=>{x.disabled=true;if(+x.dataset.ans===s.q[2])x.classList.add('right')});if(!ok)b.classList.add('wrong');
     sh.querySelector('.qres').textContent=ok?'¡Correcto!':'Fallaste. La buena está marcada en verde.';renderList()});
-  const sc=$('#scrub-'+id);
-  sc.oninput=()=>{const f=sc.value/1000;sc.style.setProperty('--p',(f*100)+'%');if(cur===id&&audio.dataset.id===id&&audio.readyState>0)audio.currentTime=f*(audio.duration||s.dur);else start(id,f)};
+  [id,s.more?id+'-mas':null].forEach(tid=>{if(!tid)return;const sc=$('#scrub-'+tid);
+  sc.oninput=()=>{const f=sc.value/1000;sc.style.setProperty('--p',(f*100)+'%');if(cur===tid&&audio.dataset.id===tid&&audio.readyState>0)audio.currentTime=f*(audio.duration||byId[tid].dur);else{audio.pause();start(tid,f)}}});
   $('#goBtn').onclick=()=>startNav(id);
   bindPlay(sh);setUI();
   findPhoto(id).then(()=>applyPhoto(id));
@@ -1477,24 +1493,24 @@ async function start(id,at){
 function toggle(id){if(sayA){sayA.pause()}if(id===cur&&audio.dataset.id===id){audio.paused?audio.play().catch(()=>{}):audio.pause()}else{audio.pause();start(id)}}
 function bindPlay(root){root.querySelectorAll('[data-play]').forEach(b=>b.onclick=()=>toggle(b.dataset.play))}
 $('#dPlay').onclick=()=>toggle(cur);
-$('#dNext').onclick=()=>{const q=seq(routeOf[cur]);const i=q.findIndex(s=>s.id===cur);const n=q[Math.min(q.length-1,i+1)];if(n.id!==cur){audio.pause();start(n.id);if(sheetId)location.hash='p-'+n.id}};
-const openCur=()=>{if(!byId[cur].isIntro)location.hash='p-'+cur};
+$('#dNext').onclick=()=>{const q=seq(routeOf[cur]);const base=byId[cur].isMore?byId[cur].parent.id:cur;const i=q.findIndex(s=>s.id===base);const n=q[Math.min(q.length-1,i+1)];if(n.id!==cur){audio.pause();start(n.id);if(sheetId)location.hash='p-'+n.id}};
+const openCur=()=>{const s=byId[cur];if(!s.isIntro)location.hash='p-'+(s.isMore?s.parent.id:cur)};
 $('#dArt').onclick=openCur;$('#dTxt').onclick=openCur;
 function setUI(){
   const on=!audio.paused&&audio.dataset.id===cur;const s=byId[cur];
   $$('[data-play]').forEach(b=>{const me=b.dataset.play===cur&&on;b.classList.toggle('is-on',me);b.innerHTML=ico(me?'pause':'play');b.setAttribute('aria-label',me?'Pausar':'Escuchar')});
   $('#dPlay').innerHTML=ico(on?'pause':'play');$('#dPlay').setAttribute('aria-label',on?'Pausar':'Reproducir');
-  $('#dName').textContent=s.isIntro?routeOf[cur].short+' · Antes de empezar':(s.extra?'Extra · ':num(s)+' · ')+s.name;
+  $('#dName').textContent=s.isIntro?routeOf[cur].short+' · Antes de empezar':s.isMore?'Más historia · '+s.name:(s.extra?'Extra · ':num(s)+' · ')+s.name;
   $('#dArt').innerHTML=`<div class="cover-bg" style="background:${grad(s.hue)}"></div>${ico(s.icon)}`;
-  $$('.srow').forEach(r=>r.classList.toggle('is-playing',on&&r.dataset.open===cur));
+  $$('.srow').forEach(r=>r.classList.toggle('is-playing',on&&(r.dataset.open===cur||r.dataset.open+'-mas'===cur)));
   if(markers)Object.keys(markers).forEach(updPin);
 }
 ['play','pause','ended','loadedmetadata'].forEach(e=>audio.addEventListener(e,setUI));
-audio.addEventListener('ended',()=>{if(!byId[cur].isIntro&&!done.has(cur)){done.add(cur);saveDone();renderList();if(sheetId===cur)openSheet(cur)}});
+audio.addEventListener('ended',()=>{if(!byId[cur].isIntro&&!byId[cur].isMore&&!done.has(cur)){done.add(cur);saveDone();renderList();if(sheetId===cur)openSheet(cur)}});
 audio.addEventListener('timeupdate',()=>{
   const d=audio.duration||byId[cur].dur,p=audio.currentTime/d;
   $('#dBar').style.width=(p*100)+'%';$('#dTime').textContent=fmt(audio.currentTime)+' / '+fmt(d);
-  if(sheetId===cur){const sc=$('#scrub-'+cur);if(sc&&document.activeElement!==sc){sc.value=Math.round(p*1000);sc.style.setProperty('--p',(p*100)+'%')}const t=$('.bp-time');if(t)t.textContent=fmt(audio.currentTime)+' / '+fmt(d)}
+  if(sheetId){const sc=$('#scrub-'+cur);if(sc&&document.activeElement!==sc){sc.value=Math.round(p*1000);sc.style.setProperty('--p',(p*100)+'%')}const t=$('#bpt-'+cur);if(t)t.textContent=fmt(audio.currentTime)+' / '+fmt(d)}
 });
 audio.addEventListener('error',()=>{$('#dTime').textContent='No se pudo cargar. Revisa la conexión.'});
 
@@ -1801,7 +1817,7 @@ function startNear(){
   watchId=watchPos(p=>{
     renderNearCard(true);
     const {latitude:la,longitude:lo}=p.coords;let best=null,bd=1e9;
-    Object.values(byId).forEach(s=>{if(s.isIntro)return;const d=distM(la,lo,s.lat,s.lng);if(d<bd){bd=d;best=s}});
+    Object.values(byId).forEach(s=>{if(s.isIntro||s.isMore)return;const d=distM(la,lo,s.lat,s.lng);if(d<bd){bd=d;best=s}});
     if(best&&bd<80&&!nearShown.has(best.id)&&!done.has(best.id)){nearShown.add(best.id);showToast(best,bd)}
   },(err,soft)=>{if(soft){renderNearCard(true,geoMsg(err));return}stopNear();renderNearCard(false,geoMsg(err))});
   store.set('kdk-near',true);
@@ -1898,7 +1914,7 @@ $$('[data-copy]').forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.w
 
 /* ---------- OFFLINE ---------- */
 const canOffline='serviceWorker' in navigator && 'caches' in window && /github\.io$/.test(location.hostname);
-const ALL_FILES=['./','./index.html','./sw.js','./data/countries.json',CO.file,'./manifest.json','./icons/apple-touch-icon.png','./icons/icon-192.png',...Object.values(byId).map(s=>s.file),...Object.values(TR),'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js'];
+const ALL_FILES=['./','./index.html','./sw.js','./data/countries.json',CO.file,'./manifest.json','./icons/apple-touch-icon.png','./icons/icon-192.png',...Object.values(byId).filter(s=>!s.isMore).map(s=>s.file),...Object.values(TR),'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js'];
 async function offlineState(){
   if(!canOffline){$('#offline').innerHTML=`<div class="art">${ico('download')}</div><div><b>Uso sin conexión</b><span>Disponible al abrir la web desde el enlace de GitHub (no desde esta vista previa).</span></div>`;return}
   let n=0;try{const c=await caches.open('kdk-v3');for(const f of ALL_FILES){if(await c.match(f))n++}}catch(e){}
@@ -1982,6 +1998,4 @@ addEventListener('hashchange',()=>{if(location.hash==='#inicio')showHome();else 
 })();
 })();
 </script>
-
-</body>
-</html>
+</body></html>
