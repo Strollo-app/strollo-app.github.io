@@ -48,5 +48,22 @@
     "desc": "Modernismo, navajas, la catedral de los cuatro siglos y la Feria con forma de sartén."
    }
   ]
+ },
+ {
+  "id": "pt",
+  "name": "Portugal",
+  "file": "data/pt.json",
+  "photo": "Lisboa - Torre de Belém.jpg",
+  "desc": "Miradores, tranvías, fado y pasteles de nata.",
+  "cities": [
+   {
+    "id": "lisboa",
+    "name": "Lisboa",
+    "routes": 3,
+    "stops": 17,
+    "photo": "Praça do Comércio Lisboa.jpg",
+    "desc": "Alfama y el castillo, la Baixa del terremoto, el Chiado de Pessoa y los monumentos de Belém."
+   }
+  ]
  }
 ]
