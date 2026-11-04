@@ -4,7 +4,7 @@
   "name": "Turquía",
   "file": "data/tr.json",
   "photo": "Hagia Sophia Mars 2013.jpg",
-  "desc": "Entre Europa y Asia: mezquitas, bazares, ferris y la mejor comida callejera.",
+  "desc": "De Estambul a Capadocia: mezquitas, bazares, ferris, chimeneas de hadas y la mejor comida callejera.",
   "cities": [
    {
     "id": "istanbul",
@@ -13,6 +13,14 @@
     "stops": 41,
     "photo": "Istanbul City skyline at Sunset.jpg",
     "desc": "Dos continentes, un estrecho y quince siglos de historia: de los bazares de la ciudad vieja a los barrios vivos de la orilla asiática."
+   },
+   {
+    "id": "capadocia",
+    "name": "Capadocia",
+    "routes": 3,
+    "stops": 15,
+    "photo": "Hot air balloons in Cappadocia.jpg",
+    "desc": "Chimeneas de hadas, iglesias excavadas en la roca, valles para caminar y los globos al amanecer."
    }
   ]
  },
