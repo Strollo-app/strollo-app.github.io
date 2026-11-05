@@ -685,6 +685,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
 		print-color-adjust: exact;
 		}
 	}
+.pcsheet{position:fixed;inset:0;z-index:90;background:rgba(10,20,26,.6);display:flex;align-items:flex-end;justify-content:center}.pcsheet[hidden]{display:none}
+.pcbox{background:var(--bg,#fff);width:100%;max-width:520px;max-height:94vh;overflow:auto;border-radius:22px 22px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom))}
+.pctop{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.pctop b{font-size:18px}
+.pcform{display:flex;gap:8px;align-items:center;margin-bottom:12px}.pcname{flex:1;min-width:0;font:inherit;padding:10px 12px;border-radius:12px;border:1px solid var(--line,#ccd);background:var(--raise,#fff);color:inherit}
+#pcCv{width:100%;height:auto;display:block;border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,.18)}.pcact{margin:12px 0 6px}
 </style>
 <style>
 /* Layout: a phone-first app. Sticky top bar, four tabbed views (Ruta, Mapa, Comer, Info), a full-screen stop sheet, and a docked player above the tab bar. Identity: Şehir Hatları ferry — Marmara blue, ferry-funnel yellow, çay amber. */
@@ -1241,7 +1246,8 @@ button.go{border:0;background:transparent;cursor:pointer;padding:2px 0;font:inhe
   <symbol id="i-tower" viewBox="0 0 48 48"><path d="M24 2l8 12H16z"/><path d="M17 14h14v6H17z"/><path d="M18 20v22h12V20"/><path d="M22 42v-6a2 2 0 0 1 4 0v6"/><path d="M22 26h4"/><path d="M14 42h20"/></symbol>
   <symbol id="i-book" viewBox="0 0 48 48"><path d="M24 12c-5-4-12-4-18-2v28c6-2 13-2 18 2 5-4 12-4 18-2V10c-6-2-13-2-18 2z"/><path d="M24 12v28"/></symbol>
   <symbol id="i-dervish" viewBox="0 0 48 48"><path d="M24 4v8"/><path d="M21 4h6l-1 8h-4z"/><circle cx="24" cy="15" r="3"/><path d="M14 16l10 4 10-6"/><path d="M24 18l-12 24h24z"/><path d="M16 36c5 2 11 2 16 0"/></symbol>
-  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5"/><path d="M5 19h14"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V4M7 8l5-5 5 5"/><path d="M5 12v7h14v-7"/></symbol><symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol><symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5"/><path d="M5 19h14"/></symbol>
   <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6z"/></symbol>
   <symbol id="i-passport" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M9 16h6"/></symbol>
   <symbol id="i-hospital" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M12 8v8M8 12h8"/></symbol>
@@ -1770,8 +1776,80 @@ function renderPass(){const all=ROUTES.flatMap(r=>r.main),got=all.filter(s=>done
   ROUTES.forEach(r=>{const n=r.main.filter(s=>done.has(s.id)).length,full=n===r.main.length&&n>0;
     h+=`<div class="prow${full?' full':''}"><h4>${esc(r.name)}<em>${full?'✓ completo':n+'/'+r.main.length}</em></h4><div class="stamps">${r.main.map((s,i)=>`<button class="stamp${done.has(s.id)?' got':''}" data-open="${s.id}" aria-label="${esc(s.name)}${done.has(s.id)?', sellada':''}">${done.has(s.id)?ico(s.icon||'check'):i+1}</button>`).join('')}</div></div>`});
   const B=[[got>=1,'Primer sello'],[fullR.length>=1,'Primer barrio completo'],[got>=Math.ceil(all.length/2),'Media ciudad'],[fullR.length===ROUTES.length,'Ciudad completa'],[Object.keys(notes).some(k=>byId[k]),'Cronista: primera nota']];
-  h+=`<div class="badges">${B.map(([ok,t])=>`<span class="badge2${ok?'':' off'}">${ico(ok?'check':'clock')}${t}</span>`).join('')}</div><p class="fnote" style="margin-top:10px">Marca cada parada como «Hecha» para sellarla. ${nParts} rincones esperan dentro de los monumentos.</p></div>`;
-  $('#tripBox').innerHTML=h;$$('#tripBox .stamp').forEach(b=>b.onclick=()=>location.hash='p-'+b.dataset.open)}
+  h+=`<div class="badges">${B.map(([ok,t])=>`<span class="badge2${ok?'':' off'}">${ico(ok?'check':'clock')}${t}</span>`).join('')}</div><p class="fnote" style="margin-top:10px">Marca cada parada como «Hecha» para sellarla. ${nParts} rincones esperan dentro de los monumentos.</p><div class="chips" style="margin-top:12px"><button class="chip primary" id="pcOpen">${ico('camera')}Crear mi tarjeta de pasaporte</button></div></div>`;
+  $('#tripBox').innerHTML=h;$$('#tripBox .stamp').forEach(b=>b.onclick=()=>location.hash='p-'+b.dataset.open);$('#pcOpen').onclick=pcOpen}
+/* ---- Tarjeta de pasaporte para compartir ---- */
+let pcImg=null;
+function pcOpen(){let el=$('#pcSheet');if(!el){el=document.createElement('div');el.id='pcSheet';el.className='pcsheet';document.body.appendChild(el)}
+  const nm=store.get('kdk-pc-name','');
+  el.innerHTML=`<div class="pcbox" role="dialog" aria-label="Tarjeta de pasaporte"><div class="pctop"><b>Tu pasaporte de ${esc(CI.name)}</b><button class="iconbtn" id="pcClose" aria-label="Cerrar">${ico('close')}</button></div>
+  <div class="pcform"><label class="chip" for="pcFile">${ico('camera')}${pcImg?'Cambiar foto':'Poner mi foto'}</label><input type="file" id="pcFile" accept="image/*" hidden>
+  <input id="pcName" class="pcname" maxlength="26" placeholder="Tu nombre" value="${esc(nm)}"></div>
+  <canvas id="pcCv" width="1080" height="1920"></canvas>
+  <div class="chips pcact"><button class="chip primary" id="pcShare">${ico('share')}Compartir</button><button class="chip" id="pcDl">Descargar</button></div>
+  <p class="fnote">Tu foto no sale del móvil: la tarjeta se crea aquí mismo. Cada parada marcada como «Hecha» es un sello.</p></div>`;
+  el.hidden=false;document.body.style.overflow='hidden';
+  const close=()=>{el.hidden=true;document.body.style.overflow=''};
+  $('#pcClose').onclick=close;el.onclick=e=>{if(e.target===el)close()};
+  $('#pcFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const im=new Image();im.onload=()=>{pcImg=im;pcDraw();$('label[for=pcFile]').lastChild.textContent='Cambiar foto'};im.src=URL.createObjectURL(f)};
+  $('#pcName').oninput=e=>{store.set('kdk-pc-name',e.target.value);pcDraw()};
+  const blob=()=>new Promise(ok=>$('#pcCv').toBlob(ok,'image/png'));const fname=`strollo-pasaporte-${CI.id}.png`;
+  $('#pcDl').onclick=async()=>{const b=await blob();const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=fname;document.body.appendChild(a);a.click();a.remove()};
+  $('#pcShare').onclick=async()=>{const b=await blob();const f=new File([b],fname,{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:'Mi pasaporte Strollo',text:`Mi pasaporte de ${CI.name} con Strollo · strollo-app.github.io`})}catch(e){}}else $('#pcDl').click()};
+  (document.fonts&&document.fonts.ready||Promise.resolve()).then(pcDraw);pcDraw()}
+function pcDraw(){const cv=$('#pcCv');if(!cv)return;const c=cv.getContext('2d'),W=1080,H=1920;
+  const D='Gloock, Georgia, serif',B='Commissioner, system-ui, sans-serif',M='"JetBrains Mono", monospace';
+  const name=($('#pcName')&&$('#pcName').value.trim())||'Viajero Strollo';
+  const all=ROUTES.flatMap(r=>r.main),got=all.filter(s=>done.has(s.id)),fullR=ROUTES.filter(r=>r.main.length&&r.main.every(s=>done.has(s.id)));
+  const dateS=new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase().replace('.','');
+  // página
+  c.fillStyle='#1F4555';c.fillRect(0,0,W,H);
+  c.save();c.translate(60,120);rr(c,0,0,W-120,H-240,44);c.fillStyle='#F4ECDC';c.fill();c.clip();
+  c.strokeStyle='rgba(31,69,85,.07)';c.lineWidth=2;for(let k=0;k<70;k++){c.beginPath();for(let x=0;x<=W;x+=12){const y=k*26+Math.sin(x/70+k*.6)*12;x?c.lineTo(x,y):c.moveTo(x,y)}c.stroke()}
+  c.fillStyle='#1F4555';c.fillRect(0,0,W-120,170);
+  c.fillStyle='#F2B827';c.font=`600 30px ${M}`;c.textAlign='left';c.fillText('PASAPORTE · PASSPORT',56,72);
+  c.fillStyle='#EAF3F6';c.font=`64px ${D}`;c.fillText('Strollo',56,140);
+  c.textAlign='right';c.font=`600 28px ${M}`;c.fillStyle='#B9D3DC';c.fillText((CO?CO.name:'').toUpperCase(),W-176,72);
+  c.font=`54px ${D}`;c.fillStyle='#EAF3F6';c.fillText(CI.name,W-176,140);c.textAlign='left';
+  // foto
+  const px=56,py=220,pw=380,ph=480;c.save();rr(c,px,py,pw,ph,22);c.fillStyle='#D9CFBC';c.fill();c.clip();
+  if(pcImg){const r=Math.max(pw/pcImg.width,ph/pcImg.height),w=pcImg.width*r,h=pcImg.height*r;c.drawImage(pcImg,px+(pw-w)/2,py+(ph-h)/2,w,h)}
+  else{c.fillStyle='#B7AA92';c.beginPath();c.arc(px+pw/2,py+190,90,0,7);c.fill();c.beginPath();c.ellipse(px+pw/2,py+ph+40,170,200,0,0,7);c.fill();
+    c.fillStyle='#7C6F5A';c.font=`500 26px ${B}`;c.textAlign='center';c.fillText('Tu foto aquí',px+pw/2,py+40+ph/2+150);c.textAlign='left'}
+  c.restore();c.strokeStyle='#1F4555';c.lineWidth=4;rr(c,px,py,pw,ph,22);c.stroke();
+  // datos
+  const fx=480;let fy=250;const field=(l,v,big)=>{c.fillStyle='#7C6F5A';c.font=`600 22px ${M}`;c.fillText(l,fx,fy);fy+=big?62:52;c.fillStyle='#12202A';c.font=big?`52px ${D}`:`600 38px ${B}`;fitText(c,v,fx,fy,W-120-fx-40);fy+=big?60:56};
+  field('NOMBRE / NAME',name,true);field('CIUDAD / CITY',CI.name);field('FECHA / DATE',dateS);field('SELLOS / STAMPS',`${got.length} de ${all.length} paradas`);if(fullR.length){c.fillStyle='#2E7D4F';c.font=`600 28px ${B}`;c.fillText(`✓ ${fullR.length} barrio${fullR.length>1?'s':''} completo${fullR.length>1?'s':''}`,fx,fy-6)}
+  // sellos
+  const ink=['#B8322A','#1F5F8B','#2E7D4F','#7A3E9D','#C2621B','#1F4555'];
+  const top=760,left=40,cols=3,cw=(W-120-left*2)/cols,rh=270;
+  const list=[{t:'ENTRADA',m:CI.name,b:dateS,big:1}].concat(got.map(s=>({t:CI.name.toUpperCase(),m:s.name,b:'STROLLO'})));
+  const max=cols*3;const show=list.slice(0,max);
+  show.forEach((st,i)=>{const col=i%cols,row=Math.floor(i/cols);const seed=[...(st.m+i)].reduce((a,ch)=>a*31+ch.charCodeAt(0)>>>0,7);
+    const x=left+cw*col+cw/2+((seed%40)-20),y=top+rh*row+rh/2+((seed>>3)%30-15),rot=((seed>>5)%36-18)*Math.PI/180;
+    stampDraw(c,x,y,st.big?122:112,st.t,st.m,st.b,ink[(seed>>2)%ink.length],rot,D,M)});
+  if(list.length>max){c.fillStyle='#1F4555';c.font=`600 30px ${B}`;c.textAlign='center';c.fillText(`+ ${list.length-max} sellos más`,(W-120)/2,top+rh*3+20);c.textAlign='left'}
+  if(!got.length){c.fillStyle='#7C6F5A';c.font=`500 30px ${B}`;c.textAlign='center';c.fillText('Marca paradas como «Hecha» para ganar sellos',(W-120)/2,top+rh+170);c.textAlign='left'}
+  // zona MRZ
+  const mrz=s=>s.normalize('NFD').replace(/[^A-Za-z0-9 ]/g,'').toUpperCase().replace(/ +/g,'<');
+  const l1=('P<'+mrz(CI.name).slice(0,12)+'<<'+mrz(name)).padEnd(40,'<').slice(0,40),l2=('STROLLO<APP<'+String(got.length).padStart(2,'0')+'<'+String(all.length).padStart(2,'0')+'<'+mrz(dateS)).padEnd(40,'<').slice(0,40);
+  c.fillStyle='#12202A';c.font=`500 31px ${M}`;c.fillText(l1,56,H-240-70);c.fillText(l2,56,H-240-28);
+  c.restore();
+  c.fillStyle='#EAF3F6';c.font=`600 34px ${M}`;c.textAlign='center';c.fillText('strollo-app.github.io',W/2,H-62);c.textAlign='left'}
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+function fitText(c,t,x,y,mw){let f=c.font,sz=parseInt(f.match(/(\d+)px/)[1]);while(c.measureText(t).width>mw&&sz>18){sz-=2;c.font=f.replace(/\d+px/,sz+'px')}c.fillText(t,x,y)}
+function arcText(c,t,r,mid,inv){c.save();const ws=[...t].map(ch=>c.measureText(ch).width+3);const tot=ws.reduce((x,y)=>x+y,0)/r;let a=mid+(inv?tot/2:-tot/2);
+  [...t].forEach((ch,i)=>{const h=ws[i]/r/2;a+=inv?-h:h;c.save();c.rotate(a);c.translate(0,-r);if(inv)c.rotate(Math.PI);c.fillText(ch,0,0);c.restore();a+=inv?-h:h});c.restore()}
+function stampDraw(c,x,y,r,top,mid,bot,col,rot,D,M){c.save();c.translate(x,y);c.rotate(rot);c.globalAlpha=.88;c.strokeStyle=col;c.fillStyle=col;
+  c.lineWidth=6;c.beginPath();c.arc(0,0,r,0,7);c.stroke();c.lineWidth=2.5;c.beginPath();c.arc(0,0,r-12,0,7);c.stroke();c.beginPath();c.arc(0,0,r-44,0,7);c.stroke();
+  c.textAlign='center';c.textBaseline='middle';c.font=`600 19px ${M}`;arcText(c,top.slice(0,16),r-28,0,false);arcText(c,bot.slice(0,16),r-28,Math.PI,true);
+  c.beginPath();c.arc(-(r-28),0,3,0,7);c.arc(r-28,0,3,0,7);c.fill();
+  const words=mid.split(' ');let lines=[''];for(const w of words){const cur=lines[lines.length-1];if(cur&&(cur+' '+w).length>10)lines.push(w);else lines[lines.length-1]=(cur+' '+w).trim()}
+  if(lines.length>3){lines=lines.slice(0,3);lines[2]+='…'}
+  const fs=lines.length>2?18:lines.length>1?21:25;c.font=`${fs}px ${D}`;lines.forEach((l,i)=>{let f=fs;while(c.measureText(l).width>(r-50)*2&&f>12){f--;c.font=`${f}px ${D}`}c.fillText(l,0,(i-(lines.length-1)/2)*fs*1.08);c.font=`${fs}px ${D}`});
+  c.fillStyle='#F4ECDC';c.globalAlpha=.55;for(let k=0;k<26;k++){const a=k*2.399,d=((k*37)%100)/100*r;c.beginPath();c.arc(Math.cos(a)*d,Math.sin(a)*d,1.5+(k%3),0,7);c.fill()}
+  c.restore()}
 function routeHours(r){const P=r.plan||[];if(P.length>=2){const a=hm(P[0][0]),b=hm(P[P.length-1][0]);if(b>a)return Math.min(7,(b-a)/60+0.75)}return Math.max(2,r.main.length*0.45)}
 function routeClosedOn(r,wd){return r.main.filter(s=>s.hours&&(s.hours.off||[]).includes(wd)).map(s=>s.name)}
 let planCfg=store.get('kdk-plan',{days:3,start:''});
