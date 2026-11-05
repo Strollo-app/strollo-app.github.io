@@ -157,5 +157,22 @@
     "desc": "La ciudad rosa: el Capitole, la basílica románica de Saint-Sernin, los Jacobinos, el Garona y el Canal du Midi."
    }
   ]
+ },
+ {
+  "name": "Reino Unido",
+  "photo": "Tower Bridge London Dusk Feb 2006.jpg",
+  "desc": "Reyes, pubs, el Támesis y museos gratis.",
+  "id": "gb",
+  "file": "data/gb.json",
+  "cities": [
+   {
+    "id": "londres",
+    "name": "Londres",
+    "routes": 2,
+    "stops": 12,
+    "photo": "Tower Bridge London Dusk Feb 2006.jpg",
+    "desc": "Trafalgar, el Big Ben y la abadía de Westminster, Buckingham, San Pablo, el Támesis, el Tower Bridge y la Torre de Londres."
+   }
+  ]
  }
 ]
