@@ -1282,6 +1282,7 @@ button.go{border:0;background:transparent;cursor:pointer;padding:2px 0;font:inhe
    <div class="sec-title"><h2>Las paradas</h2><span class="eyebrow">Toca para abrir</span></div>
    <div class="qscore" id="quizScore"></div>
    <ol class="stops" id="list"></ol>
+   <div class="chips" id="allDoneBox" style="justify-content:center;margin-top:6px"></div>
   </div></div>
  </section>
 
@@ -1507,6 +1508,11 @@ function renderList(){
   if(markers)Object.keys(markers).forEach(updPin);
   renderRouteChipsCounts();
   R.stops.forEach(s=>applyPhoto(s.id));loadPhotos(R.stops);
+  const all=R.main.length&&R.main.every(s=>done.has(s.id));const box=$('#allDoneBox');
+  box.innerHTML=`<button class="chip${all?'':' primary'}" id="allDoneBtn">${ico(all?'back':'check')}${all?'Desmarcar todo el barrio':'Marcar todo el barrio como hecho'}</button>`;
+  let armed=0;$('#allDoneBtn').onclick=e=>{const b=e.currentTarget;
+    if(!armed){armed=1;b.lastChild.textContent=all?'¿Seguro? Toca otra vez para desmarcar':'¿Seguro? Toca otra vez para marcar las '+R.main.length;setTimeout(()=>{if(armed&&b.isConnected){armed=0;b.lastChild.textContent=all?'Desmarcar todo el barrio':'Marcar todo el barrio como hecho'}},4000);return}
+    R.main.forEach(s=>all?done.delete(s.id):done.add(s.id));saveDone();try{renderRouteChips()}catch(err){}renderList();};
 }
 function renderRouteChipsCounts(){$$('.rchip').forEach(b=>{const r=routeById[b.dataset.route];b.querySelector('small').textContent=r.main.filter(s=>done.has(s.id)).length+'/'+r.main.length})}
 
