@@ -866,6 +866,11 @@ main{padding-bottom:calc(var(--tabs) + var(--dock) + env(safe-area-inset-bottom,
 .moreplayer{border:1.5px dashed var(--line,#d9d2c3)}
 .mp-head{font:600 11px/1 var(--mono,monospace);letter-spacing:.08em;text-transform:uppercase;opacity:.7;margin-bottom:10px}
 .mp-head span{display:inline-flex;gap:6px;align-items:center}.mp-head .ico{width:14px;height:14px}
+.stcard{padding:12px 14px}.stline{display:flex;align-items:center;gap:10px}.stline b{font-size:15px}
+.stdot{width:12px;height:12px;border-radius:6px;background:var(--muted);flex:none}.stcard.open .stdot{background:var(--ok)}.stcard.closed .stdot{background:#D93025}.stcard.soon .stdot{background:var(--stripe)}
+.stsub{margin:4px 0 0 22px;color:var(--muted);font-size:13.5px;line-height:1.4}
+.prtimes{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin:10px 0 2px}.prtimes div{text-align:center;border-radius:10px;padding:6px 2px;background:var(--raise)}
+.prtimes small{display:block;font-size:10.5px;color:var(--muted)}.prtimes b{font:600 13px var(--mono,monospace)}.prtimes div.now{background:color-mix(in srgb,#D93025 18%,var(--raise))}.prtimes div.next{outline:1.5px solid var(--stripe)}
 .parts h3{margin-bottom:2px}
 .plan{margin:4px 0 14px;border:1px solid var(--line);border-radius:16px;background:var(--raise);overflow:hidden}
 .plan svg{display:block;width:100%;height:auto;touch-action:manipulation}
@@ -1487,6 +1492,7 @@ function openSheet(id){
       </div>
       <input type="range" class="scrub" id="scrub-${s.id}" min="0" max="1000" value="0" aria-label="Posición del audio">
     </div>
+    ${s.hours||s.mosque?`<div class="card block stcard" id="stc-${s.id}" aria-live="polite"><div class="stline"><span class="stdot"></span><b>Comprobando horario…</b></div></div>`:''}
     ${s.more?`<div class="card bigplayer moreplayer">
       <div class="mp-head"><span>${ico('headphones')}Para los que queréis más</span></div>
       <div class="bp-row">
@@ -1530,7 +1536,7 @@ function openSheet(id){
   $('#sBack').onclick=()=>{location.hash=lastTab||'ruta'};
   $('#doneBtn').onclick=()=>{done.has(id)?done.delete(id):done.add(id);saveDone();renderList();openSheet(id)};
   sh.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{if(b.dataset.go)location.hash='p-'+b.dataset.go});
-  sh.querySelectorAll('.pitem summary [data-play]').forEach(b=>b.addEventListener('click',e=>e.preventDefault()));loadPartPhotos(sh,s);bindPlan(sh,s);
+  sh.querySelectorAll('.pitem summary [data-play]').forEach(b=>b.addEventListener('click',e=>e.preventDefault()));loadPartPhotos(sh,s);bindPlan(sh,s);renderStatus(s);
   sh.querySelectorAll('[data-skip]').forEach(b=>b.onclick=()=>{const f=b.dataset.for,k=+b.dataset.skip;if(cur===f&&audio.src){audio.currentTime=k<=-999?0:Math.max(0,audio.currentTime+k);if(k<=-999&&audio.paused)toggle(f)}else if(k<=-999)start(f,0)});
   sh.querySelectorAll('[data-ans]').forEach(b=>b.onclick=()=>{const k=+b.dataset.ans,ok=k===s.q[2];quiz[id]=ok;saveQuiz();
     sh.querySelectorAll('[data-ans]').forEach(x=>{x.disabled=true;if(+x.dataset.ans===s.q[2])x.classList.add('right')});if(!ok)b.classList.add('wrong');
@@ -1682,6 +1688,38 @@ function compassStop(reset){if(cmpEv)window.removeEventListener(cmpEv,onOri);com
 $('#compassBtn').onclick=()=>{if(!canRotate()){mapToast('Abre el mapa para poder girarlo');return}
   if(compassOn)compassStop(true);else if(Math.abs(map.getBearing())>1)map.setBearing(0);else compassStart(false)};
 $('#recenter').onclick=()=>{if(nav){nav.follow=true;$('#recenter').hidden=true;if(nav.last)map.setView(nav.last,18)}};
+/* ---------- HORARIOS Y REZOS ---------- */
+const TZ={tr:'Europe/Istanbul',es:'Europe/Madrid',pt:'Europe/Lisbon',de:'Europe/Berlin',hu:'Europe/Budapest',gr:'Europe/Athens'};
+function nowIn(){const tz=TZ[CO.id]||undefined;const f=new Intl.DateTimeFormat('en-GB',{timeZone:tz,weekday:'short',hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit',year:'numeric',hour12:false});
+  const o={};f.formatToParts(new Date()).forEach(p=>o[p.type]=p.value);const wd=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(o.weekday);
+  return {d:wd,m:(+o.hour%24)*60+(+o.minute),date:`${o.day}-${o.month}-${o.year}`}}
+const hm=s=>{const [a,b]=s.split(':');return +a*60+ +b};const mh=m=>{m=((m%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')};
+const DIAS=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+function hoursState(H,n){if(!H)return null;const off=H.off||[];const day=(H.d&&H.d[n.d])||(off.includes(n.d)?null:[H.o,H.c]);
+  const fmtNext=()=>{for(let k=1;k<=7;k++){const dd=(n.d+k)%7;const sp=(H.d&&H.d[dd])||(off.includes(dd)?null:[H.o,H.c]);if(sp)return (k===1?'mañana':'el '+DIAS[dd])+' a las '+sp[0]}return ''};
+  if(!day)return {st:'closed',t:'Hoy cerrado',sub:`Cierra los ${off.map(x=>DIAS[x]).join(' y ')}. Abre ${fmtNext()}.`};
+  const o=hm(day[0]),c=hm(day[1]),last=H.last!=null?c-H.last:null;
+  if(n.m<o)return {st:'closed',t:'Cerrado ahora',sub:`Abre hoy a las ${day[0]} y cierra a las ${day[1]}.`};
+  if(n.m>=c)return {st:'closed',t:'Cerrado ahora',sub:`Hoy cerraba a las ${day[1]}. Abre ${fmtNext()}.`};
+  if(last!=null&&n.m>=last)return {st:'soon',t:'Última entrada pasada',sub:`La última entrada era a las ${mh(last)}; cierra a las ${day[1]}.`};
+  if(c-n.m<=60)return {st:'soon',t:`Abierto · cierra en ${c-n.m} min`,sub:`Hoy de ${day[0]} a ${day[1]}${last!=null?`, última entrada ${mh(last)}`:''}.`};
+  return {st:'open',t:'Abierto ahora',sub:`Hoy de ${day[0]} a ${day[1]}${last!=null?`, última entrada ${mh(last)}`:''}.`}}
+const PRN=[['Fajr','Alba'],['Dhuhr','Mediodía'],['Asr','Tarde'],['Maghrib','Atardecer'],['Isha','Noche']];
+async function prayerTimes(s,n){const key='kdk-pray-'+n.date+'-'+s.lat.toFixed(2)+','+s.lng.toFixed(2);const c=store.get(key,null);if(c)return c;
+  try{const j=await (await fetch(`https://api.aladhan.com/v1/timings/${n.date}?latitude=${s.lat}&longitude=${s.lng}&method=13`)).json();const t={};PRN.forEach(([k])=>t[k]=j.data.timings[k].slice(0,5));store.set(key,t);return t}catch(e){return null}}
+async function renderStatus(s){const el=document.getElementById('stc-'+s.id);if(!el)return;const n=nowIn();let html='',cls='';
+  const hs=hoursState(s.hours,n);
+  if(s.mosque){const t=await prayerTimes(s,n);if(!document.body.contains(el))return;
+    if(t){const fri=n.d===5;let cur=null,next=null;
+      PRN.slice(1).forEach(([k,lb])=>{const p=hm(t[k]);const a=p-(fri&&k==='Dhuhr'?60:15),b=p+(fri&&k==='Dhuhr'?60:40);if(n.m>=a&&n.m<b)cur={k,lb,a,b};else if(!next&&n.m<a)next={k,lb,a,b,p}});
+      if(cur){cls='closed';html=`<div class="stline"><span class="stdot"></span><b>Rezo de ${cur.lb.toLowerCase()}: cerrada a turistas</b></div><p class="stsub">Vuelve a abrir hacia las ${mh(cur.b)}.${fri&&cur.k==='Dhuhr'?' Los viernes a mediodía el rezo es más largo.':''}</p>`}
+      else if(next){const soon=next.a-n.m<=30;cls=soon?'soon':'open';html=`<div class="stline"><span class="stdot"></span><b>${soon?`Rezo en ${next.p-n.m} min`:'Abierta a visitas'}</b></div><p class="stsub">Próximo rezo: ${next.lb.toLowerCase()} a las ${t[next.k]}. Suele cerrarse a turistas de ${mh(next.a)} a ${mh(next.b)}.</p>`}
+      else{cls='open';html=`<div class="stline"><span class="stdot"></span><b>Sin más rezos con cierre hoy</b></div><p class="stsub">Último rezo, a las ${t.Isha}.</p>`}
+      html+=`<div class="prtimes">${PRN.map(([k,lb])=>`<div class="${cur&&cur.k===k?'now':next&&next.k===k?'next':''}"><small>${lb}</small><b>${t[k]}</b></div>`).join('')}</div><p class="stsub" style="margin-left:0">Horas de rezo de hoy (Diyanet). Los cierres son aproximados y varían según la mezquita.</p>`}
+    else html=`<div class="stline"><span class="stdot"></span><b>Mezquita</b></div><p class="stsub">Durante cada rezo se cierra a los turistas unos 30–60 minutos. Sin conexión no puedo calcular las horas de hoy.</p>`;
+    if(hs&&hs.st!=='open'){html=`<div class="stline"><span class="stdot" style="background:#D93025"></span><b>${hs.t}</b></div><p class="stsub">${hs.sub}</p>`+html;cls='closed'}}
+  else if(hs){cls=hs.st;html=`<div class="stline"><span class="stdot"></span><b>${hs.t}</b></div><p class="stsub">${hs.sub}${s.hours.note?' '+esc(s.hours.note):''}</p>`}
+  el.className='card block stcard '+cls;el.innerHTML=html||'';if(!html)el.hidden=true}
 /* ---------- PLANO DE RINCONES ---------- */
 function planSVG(s){const P=s.plan,[W,H]=P.vb;const sh=(P.shapes||[]).map(o=>{const c=`pl-${o.c||'area'}`;
   if(o.t==='rect')return `<rect class="${c}" x="${o.x}" y="${o.y}" width="${o.w}" height="${o.h}" rx="${o.r||0}"/>`;
