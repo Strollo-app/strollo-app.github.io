@@ -1690,15 +1690,20 @@ function drawRoute(fit){
   if(fit)map.fitBounds(L.latLngBounds(R.stops.map(s=>[s.lat,s.lng])),{padding:[30,30]});
 }
 function initMap(){
-  if(mapReady){map&&map.invalidateSize();return}mapReady=true;
+  if(mapReady){if(map){map.invalidateSize();window.mapTilesCheck&&window.mapTilesCheck()}return}mapReady=true;
   if(typeof L==='undefined'){schematic();return}
   map=L.map('map',{zoomControl:false,attributionControl:true,rotate:true,touchRotate:true,rotateControl:false,shiftKeyRotate:false,bearing:0}).setView([41.01,28.98],14);
-  let ok=0,bad=0,fell=false,alt=false;
-  let tl=L.tileLayer('https://{s}.basemap.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',attribution:'© OpenStreetMap · © CARTO'}).addTo(map);
-  const watch=t=>{t.on('tileload',()=>ok++);t.on('tileerror',()=>{bad++;
-    if(!ok&&bad>=4&&!alt){alt=true;bad=0;map.removeLayer(tl);tl=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);watch(tl)}
-    else if(!ok&&bad>=4&&alt&&!fell){fell=true;$('#map').style.display='none';schematic()}})};
-  watch(tl);drawRoute(true);if(nav&&nav.route)drawNav(nav.i,nav.last);
+  const PROV=[['https://{s}.basemap.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',attribution:'© OpenStreetMap · © CARTO'}],
+    ['https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}],
+    ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'© Esri · OpenStreetMap'}]];
+  let pi=0,ok=0,bad=0,tl=null,tmr=null;
+  const next=()=>{if(pi<PROV.length-1){pi++;use()}else if(!ok){$('#map').style.display='none';schematic()}};
+  const use=()=>{if(tl)map.removeLayer(tl);ok=0;bad=0;tl=L.tileLayer(PROV[pi][0],PROV[pi][1]).addTo(map);
+    tl.on('tileload',()=>ok++);tl.on('tileerror',()=>{bad++;if(bad>=4&&bad>ok*2)next()});
+    clearTimeout(tmr);tmr=setTimeout(()=>{if(!ok)next()},7000)};
+  window.mapTilesCheck=()=>{if(tl&&!document.querySelector('#map .leaflet-tile-loaded')){tl.redraw();clearTimeout(tmr);tmr=setTimeout(()=>{if(!document.querySelector('#map .leaflet-tile-loaded'))next()},6000)}};
+  use();
+  drawRoute(true);if(nav&&nav.route)drawNav(nav.i,nav.last);
   map.on('dragstart',()=>{if(nav){nav.follow=false;$('#recenter').hidden=false}});map.on('rotate',()=>{setNeedle();updArrow()});setNeedle();if(foodOn)drawFood();
 }
 $('#foodBtn').onclick=()=>{foodOn=!foodOn;store.set('kdk-foodmap',foodOn);drawFood();if(!foodOn)$('#mapNote').textContent='Toca un número para ver la parada'};
