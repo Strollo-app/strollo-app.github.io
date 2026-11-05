@@ -866,6 +866,15 @@ main{padding-bottom:calc(var(--tabs) + var(--dock) + env(safe-area-inset-bottom,
 .moreplayer{border:1.5px dashed var(--line,#d9d2c3)}
 .mp-head{font:600 11px/1 var(--mono,monospace);letter-spacing:.08em;text-transform:uppercase;opacity:.7;margin-bottom:10px}
 .mp-head span{display:inline-flex;gap:6px;align-items:center}.mp-head .ico{width:14px;height:14px}
+.parts h3{margin-bottom:2px}.psub{margin:0 0 12px;color:var(--muted);font-size:14px}
+.pitem{border-top:1px solid var(--line)}.pitem:first-of-type{border-top:0}
+.pitem summary{list-style:none;display:flex;align-items:center;gap:12px;padding:10px 0;cursor:pointer}.pitem summary::-webkit-details-marker{display:none}
+.pimg{width:64px;height:64px;border-radius:12px;flex:none;background:var(--raise) center/cover no-repeat;border:1px solid var(--line)}
+.ptxt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.ptxt b{font-size:15px;line-height:1.25}.ptxt small{color:var(--muted);font-size:12.5px;line-height:1.3}
+.pdur{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono,monospace)}.pdur .ico{width:12px;height:12px}
+.pitem .pbtn{width:42px;height:42px}.pitem.is-playing summary b{color:var(--cay)}
+.pbody{padding:0 0 14px}.pbody p{margin:0 0 10px;line-height:1.5}.ptr{font-family:var(--mono,monospace);font-size:12px;color:var(--muted)}
+.pfig{margin:0 0 10px;border-radius:14px;overflow:hidden;background:var(--raise)}.pfig img{display:block;width:100%;max-height:260px;object-fit:cover}.pfig figcaption{font-size:11px;color:var(--muted);padding:4px 8px}
 .morecur ul{margin:0;padding-left:18px}.morecur li{margin:0 0 8px;line-height:1.45}
 .tipbox{background:var(--cay-soft);border-color:transparent}
 .tipbox h3{color:var(--cay)}
@@ -1360,7 +1369,7 @@ const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.
 
 /* index everything */
 const byId={};const routeOf={};
-ROUTES.forEach(r=>{r.main=r.stops.filter(s=>!s.extra);byId[r.intro.id]=Object.assign(r.intro,{isIntro:true,hue:30,icon:'headphones'});routeOf[r.intro.id]=r;r.stops.forEach(s=>{byId[s.id]=s;routeOf[s.id]=r;if(s.more){const m={id:s.id+'-mas',file:s.more.file,dur:s.more.dur,isMore:true,parent:s,name:s.name,hue:s.hue,icon:s.icon};byId[m.id]=m;routeOf[m.id]=r}})});
+ROUTES.forEach(r=>{r.main=r.stops.filter(s=>!s.extra);byId[r.intro.id]=Object.assign(r.intro,{isIntro:true,hue:30,icon:'headphones'});routeOf[r.intro.id]=r;r.stops.forEach(s=>{byId[s.id]=s;routeOf[s.id]=r;if(s.more){const m={id:s.id+'-mas',file:s.more.file,dur:s.more.dur,isMore:true,parent:s,name:s.name,hue:s.hue,icon:s.icon};byId[m.id]=m;routeOf[m.id]=r}(s.parts||[]).forEach(pt=>{const m={id:s.id+'-p-'+pt.id,file:pt.file,dur:pt.dur,isMore:true,partName:pt.name,parent:s,name:s.name,hue:s.hue,icon:s.icon};byId[m.id]=m;routeOf[m.id]=r})})});
 const routeById=Object.fromEntries(ROUTES.map(r=>[r.id,r]));
 let R=routeById[store.get('strollo-route-'+CI.id,CI.routes[0].id)]||ROUTES[0];
 const num=s=>s.extra?'+':String(routeOf[s.id].main.indexOf(s)+1);
@@ -1447,6 +1456,12 @@ function openSheet(id){
       </div>
       <input type="range" class="scrub" id="scrub-${s.id}-mas" data-scrub="${s.id}-mas" min="0" max="1000" value="0" aria-label="Posición del audio de más historia">
     </div>`:''}
+    ${s.parts&&s.parts.length?`<div class="card block parts"><h3>Dentro de la parada</h3><p class="psub">${s.parts.length} rincones para mirar con calma, cada uno con su audio</p>
+      ${s.parts.map(p=>`<details class="pitem" data-part="${s.id}-p-${p.id}">
+        <summary><span class="pimg" data-pph="${s.id}|${p.id}"></span><span class="ptxt"><b>${esc(p.name)}</b><small>${esc(p.where||'')}</small><small class="pdur">${ico('headphones')}${fmt(p.dur)}</small></span><button class="pbtn" data-play="${s.id}-p-${p.id}" aria-label="Escuchar ${esc(p.name)}">${ico('play')}</button></summary>
+        <div class="pbody"><figure class="pfig" data-pphbig="${s.id}|${p.id}"></figure>${p.tr?`<p class="ptr">${esc(p.tr)}</p>`:''}${p.text.split('\n\n').map(t=>'<p>'+esc(t)+'</p>').join('')}</div>
+      </details>`).join('')}
+    </div>`:''}
     <div class="chips">
       <button class="chip primary" id="goBtn">${ico('route')}Llevarme aquí</button>
       <a class="chip" href="${maps}" target="_blank" rel="noopener">${ico('pin')}Google Maps</a>
@@ -1473,6 +1488,7 @@ function openSheet(id){
   $('#sBack').onclick=()=>{location.hash=lastTab||'ruta'};
   $('#doneBtn').onclick=()=>{done.has(id)?done.delete(id):done.add(id);saveDone();renderList();openSheet(id)};
   sh.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{if(b.dataset.go)location.hash='p-'+b.dataset.go});
+  sh.querySelectorAll('.pitem summary [data-play]').forEach(b=>b.addEventListener('click',e=>e.preventDefault()));loadPartPhotos(sh,s);
   sh.querySelectorAll('[data-skip]').forEach(b=>b.onclick=()=>{if(cur===b.dataset.for&&audio.src)audio.currentTime=Math.max(0,audio.currentTime+ +b.dataset.skip)});
   sh.querySelectorAll('[data-ans]').forEach(b=>b.onclick=()=>{const k=+b.dataset.ans,ok=k===s.q[2];quiz[id]=ok;saveQuiz();
     sh.querySelectorAll('[data-ans]').forEach(x=>{x.disabled=true;if(+x.dataset.ans===s.q[2])x.classList.add('right')});if(!ok)b.classList.add('wrong');
@@ -1507,9 +1523,9 @@ function setUI(){
   const on=!audio.paused&&audio.dataset.id===cur;const s=byId[cur];
   $$('[data-play]').forEach(b=>{const me=b.dataset.play===cur&&on;b.classList.toggle('is-on',me);b.innerHTML=ico(me?'pause':'play');b.setAttribute('aria-label',me?'Pausar':'Escuchar')});
   $('#dPlay').innerHTML=ico(on?'pause':'play');$('#dPlay').setAttribute('aria-label',on?'Pausar':'Reproducir');
-  $('#dName').textContent=s.isIntro?routeOf[cur].short+' · Antes de empezar':s.isMore?'Más historia · '+s.name:(s.extra?'Extra · ':num(s)+' · ')+s.name;
+  $('#dName').textContent=s.isIntro?routeOf[cur].short+' · Antes de empezar':s.isMore?(s.partName?s.partName+' · '+s.name:'Más historia · '+s.name):(s.extra?'Extra · ':num(s)+' · ')+s.name;
   $('#dArt').innerHTML=`<div class="cover-bg" style="background:${grad(s.hue)}"></div>${ico(s.icon)}`;
-  $$('.srow').forEach(r=>r.classList.toggle('is-playing',on&&(r.dataset.open===cur||r.dataset.open+'-mas'===cur)));
+  $$('.srow').forEach(r=>r.classList.toggle('is-playing',on&&(r.dataset.open===cur||(byId[cur]&&byId[cur].parent&&byId[cur].parent.id===r.dataset.open))));$$('.pitem').forEach(r=>r.classList.toggle('is-playing',on&&r.dataset.part===cur));
   if(markers)Object.keys(markers).forEach(updPin);
 }
 ['play','pause','ended','loadedmetadata'].forEach(e=>audio.addEventListener(e,setUI));
@@ -1624,6 +1640,14 @@ $('#compassBtn').onclick=()=>{if(!canRotate()){mapToast('Abre el mapa para poder
   if(compassOn)compassStop(true);else if(Math.abs(map.getBearing())>1)map.setBearing(0);else compassStart(false)};
 $('#recenter').onclick=()=>{if(nav){nav.follow=true;$('#recenter').hidden=true;if(nav.last)map.setView(nav.last,18)}};
 /* ---------- PHOTOS (Wikimedia Commons) ---------- */
+let pph=store.get('kdk-pph',{});
+function pphUrl(f,w){return 'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(f.replace(/ /g,'_'))+'?width='+w}
+async function pphFile(p){if(p.photo)return p.photo;if(!p.photoQ)return null;if(pph[p.photoQ]!==undefined)return pph[p.photoQ];
+  try{const u='https://commons.wikimedia.org/w/api.php?action=query&list=search&srnamespace=6&srlimit=5&format=json&origin=*&srsearch='+encodeURIComponent(p.photoQ+' filetype:bitmap');
+    const j=await (await fetch(u)).json();const t=(j.query.search||[]).map(x=>x.title.replace(/^File:/,'')).find(x=>/\.(jpe?g|png)$/i.test(x))||null;pph[p.photoQ]=t;store.set('kdk-pph',pph);return t}catch(e){return null}}
+function loadPartPhotos(sh,s){(s.parts||[]).forEach(async p=>{const f=await pphFile(p);if(!f)return;
+  const th=sh.querySelector(`[data-pph="${s.id}|${p.id}"]`);if(th)th.style.backgroundImage=`url("${pphUrl(f,160)}")`;
+  const big=sh.querySelector(`[data-pphbig="${s.id}|${p.id}"]`);if(big)big.innerHTML=`<img loading="lazy" alt="${esc(p.name)}" src="${pphUrl(f,800)}"><figcaption>Foto: <a href="https://commons.wikimedia.org/wiki/File:${encodeURIComponent(f.replace(/ /g,'_'))}" target="_blank" rel="noopener">Wikimedia Commons</a></figcaption>`})}
 const PH=CI.photoCands||{};
 let photos=store.get('kdk-photos',{});
 const savePhotos=()=>store.set('kdk-photos',photos);
