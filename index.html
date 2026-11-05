@@ -872,6 +872,18 @@ main{padding-bottom:calc(var(--tabs) + var(--dock) + env(safe-area-inset-bottom,
 .prtimes{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin:10px 0 2px}.prtimes div{text-align:center;border-radius:10px;padding:6px 2px;background:var(--raise)}
 .prtimes small{display:block;font-size:10.5px;color:var(--muted)}.prtimes b{font:600 13px var(--mono,monospace)}.prtimes div.now{background:color-mix(in srgb,#D93025 18%,var(--raise))}.prtimes div.next{outline:1.5px solid var(--stripe)}
 .pack .offbar{height:4px;border-radius:2px;background:var(--line);margin-top:8px;overflow:hidden}.pack .offbar i{display:block;height:100%;background:var(--ok)}.pack .chip{align-self:center}
+.seg{display:flex;gap:6px;background:var(--raise);border:1px solid var(--line);border-radius:999px;padding:4px}.seg button{flex:1;border:0;background:transparent;border-radius:999px;padding:9px 6px;font:600 13px var(--sans,system-ui);color:var(--ink);cursor:pointer;min-height:40px}.seg button[aria-selected="true"]{background:var(--sea);color:var(--sea-ink)}
+.passhead{display:flex;align-items:center;gap:14px}.passring{width:64px;height:64px;flex:none}.passhead b{font-size:18px}.passhead span{color:var(--muted);font-size:13px}
+.prow{margin-top:14px}.prow h4{margin:0 0 8px;font-size:14px;display:flex;justify-content:space-between;align-items:center;gap:8px}.prow h4 em{font-style:normal;font:600 11px var(--mono,monospace);color:var(--muted)}.prow.full h4 em{color:var(--ok)}
+.stamps{display:flex;flex-wrap:wrap;gap:8px}.stamp{width:44px;height:44px;border-radius:50%;border:2px dashed var(--line);display:grid;place-items:center;color:var(--muted);font:700 12px var(--mono,monospace);background:transparent;cursor:pointer;padding:0}
+.stamp.got{border:2px solid var(--ok);background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok);transform:rotate(-8deg)}.stamp .ico{width:18px;height:18px}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.badge2{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--ok-soft);color:var(--ok);font-size:12.5px;font-weight:600}.badge2.off{background:var(--raise);color:var(--muted)}.badge2 .ico{width:14px;height:14px}
+.planform{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.planform label{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:4px}.planform input,.planform select{font:inherit;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);min-height:40px}
+.pday{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}.pday h4{margin:0 0 8px;font-size:15px}.pslot{display:grid;grid-template-columns:56px 1fr;gap:8px;padding:6px 0}.pslot .t{font:600 12px var(--mono,monospace);color:var(--muted);padding-top:2px}.pslot b{display:block;font-size:14px}.pslot span{font-size:13px;color:var(--muted);line-height:1.4}.pslot a{color:inherit}
+.pwarn{font-size:12.5px;color:var(--cay);margin:4px 0 0}
+.diary textarea{width:100%;box-sizing:border-box;font:inherit;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--surface);color:var(--ink);resize:vertical}
+.dphotos{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.dphotos figure{margin:0;position:relative}.dphotos img{width:76px;height:76px;object-fit:cover;border-radius:10px;display:block}.dphotos button{position:absolute;top:-6px;right:-6px;width:24px;height:24px;border-radius:12px;border:0;background:#12202A;color:#fff;font-size:12px;cursor:pointer}
+.dadd{display:inline-flex;align-items:center;gap:6px;cursor:pointer}.dentry{border-top:1px solid var(--line);padding:10px 0}.dentry b{display:block}.dentry p{margin:4px 0 0;white-space:pre-wrap;font-size:14px;line-height:1.45}
 .parts h3{margin-bottom:2px}
 .plan{margin:4px 0 14px;border:1px solid var(--line);border-radius:16px;background:var(--raise);overflow:hidden}
 .plan svg{display:block;width:100%;height:auto;touch-action:manipulation}
@@ -1339,6 +1351,9 @@ button.go{border:0;background:transparent;cursor:pointer;padding:2px 0;font:inhe
  <!-- INFO -->
  <section class="view" id="v-info" aria-label="Información">
   <div class="pad"><div class="inner stack">
+   <div class="sec-title"><h2>Mi viaje</h2><span class="eyebrow">Solo en tu móvil</span></div>
+   <div class="seg" role="tablist" id="tripTabs"><button role="tab" data-tt="pass" aria-selected="true">Pasaporte</button><button role="tab" data-tt="plan" aria-selected="false">Plan por días</button><button role="tab" data-tt="diary" aria-selected="false">Diario</button></div>
+   <div id="tripBox"></div>
    <div class="card intro" id="offline"></div>
    <div class="sec-title" id="fxSec"><h2 id="fxTitle">Conversor</h2><span class="eyebrow">Conversor</span></div>
    <div class="card block fx" id="fxBox">
@@ -1527,6 +1542,8 @@ function openSheet(id){
     ${s.more&&s.more.curios?`<div class="card block morecur"><h3>Más curiosidades</h3><ul>${s.more.curios.map(c=>`<li>${esc(c)}</li>`).join('')}</ul></div>`:''}
     ${s.q?`<div class="card block quiz" id="quizBox"><h3>Pregunta del grupo</h3><p class="qq">${esc(s.q[0])}</p><div class="qopts">${s.q[1].map((o,k)=>`<button data-ans="${k}" class="${qa!=null?(k===s.q[2]?'right':''):''}" ${qa!=null?'disabled':''}>${esc(o)}</button>`).join('')}</div><p class="qres">${qa==null?'Escuchad el audio y responded.':(qa?'¡Correcto!':'Fallaste. La buena está marcada en verde.')}</p></div>`:''}
     <div class="card block nextbox"><h3>${s.extra?'Cómo volver':(next&&!next.extra?'Hacia la parada '+num(next)+' · '+esc(next.name):'Final')}</h3><p class="gorow">${ico('walk')}<span>${esc(s.go||'')}${next&&!next.extra&&next.walk?' <b>≈ '+next.walk+' min.</b>':''}</span></p></div>
+    <div class="card block diary"><h3>Mi diario</h3><textarea id="note-${s.id}" rows="3" placeholder="Apunta lo que no quieras olvidar de este sitio…" aria-label="Notas sobre ${esc(s.name)}"></textarea>
+      <div class="dphotos" id="dph-${s.id}"></div><label class="chip dadd">${ico('download')}<span>Añadir foto</span><input type="file" accept="image/*" capture="environment" id="dfile-${s.id}" hidden></label></div>
     <details class="card script"><summary>Leer el texto del audio ${ico('chev')}</summary>${s.text.split('\n\n').map(p=>'<p>'+esc(p)+'</p>').join('')}</details>
     ${s.more&&s.more.text?`<details class="card script"><summary>Leer «Más historia» ${ico('chev')}</summary>${s.more.text.split('\n\n').map(p=>'<p>'+esc(p)+'</p>').join('')}</details>`:''}
     <div class="pager">
@@ -1538,7 +1555,7 @@ function openSheet(id){
   $('#sBack').onclick=()=>{location.hash=lastTab||'ruta'};
   $('#doneBtn').onclick=()=>{done.has(id)?done.delete(id):done.add(id);saveDone();renderList();openSheet(id)};
   sh.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{if(b.dataset.go)location.hash='p-'+b.dataset.go});
-  sh.querySelectorAll('.pitem summary [data-play]').forEach(b=>b.addEventListener('click',e=>e.preventDefault()));loadPartPhotos(sh,s);bindPlan(sh,s);renderStatus(s);
+  sh.querySelectorAll('.pitem summary [data-play]').forEach(b=>b.addEventListener('click',e=>e.preventDefault()));loadPartPhotos(sh,s);bindPlan(sh,s);renderStatus(s);bindDiary(s);
   sh.querySelectorAll('[data-skip]').forEach(b=>b.onclick=()=>{const f=b.dataset.for,k=+b.dataset.skip;if(cur===f&&audio.src){audio.currentTime=k<=-999?0:Math.max(0,audio.currentTime+k);if(k<=-999&&audio.paused)toggle(f)}else if(k<=-999)start(f,0)});
   sh.querySelectorAll('[data-ans]').forEach(b=>b.onclick=()=>{const k=+b.dataset.ans,ok=k===s.q[2];quiz[id]=ok;saveQuiz();
     sh.querySelectorAll('[data-ans]').forEach(x=>{x.disabled=true;if(+x.dataset.ans===s.q[2])x.classList.add('right')});if(!ok)b.classList.add('wrong');
@@ -1722,6 +1739,66 @@ async function renderStatus(s){const el=document.getElementById('stc-'+s.id);if(
     if(hs&&hs.st!=='open'){html=`<div class="stline"><span class="stdot" style="background:#D93025"></span><b>${hs.t}</b></div><p class="stsub">${hs.sub}</p>`+html;cls='closed'}}
   else if(hs){cls=hs.st;html=`<div class="stline"><span class="stdot"></span><b>${hs.t}</b></div><p class="stsub">${hs.sub}${s.hours.note?' '+esc(s.hours.note):''}</p>`}
   el.className='card block stcard '+cls;el.innerHTML=html||'';if(!html)el.hidden=true}
+/* ---------- DIARIO (notas en localStorage, fotos en IndexedDB) ---------- */
+let notes=store.get('kdk-notes',{});
+const idb=(()=>{let dbp=null;const open=()=>dbp||(dbp=new Promise((ok,ko)=>{try{const r=indexedDB.open('strollo-diary',1);r.onupgradeneeded=()=>r.result.createObjectStore('ph',{keyPath:'k'});r.onsuccess=()=>ok(r.result);r.onerror=()=>ko(r.error)}catch(e){ko(e)}}));
+  const tx=async(m,f)=>{const db=await open();return new Promise((ok,ko)=>{const t=db.transaction('ph',m);const s=t.objectStore('ph');const r=f(s);t.oncomplete=()=>ok(r&&r.result);t.onerror=()=>ko(t.error)})};
+  return {put:o=>tx('readwrite',s=>s.put(o)),del:k=>tx('readwrite',s=>s.delete(k)),all:()=>tx('readonly',s=>s.getAll())}})();
+async function shrink(file){try{const bmp=await createImageBitmap(file);const sc=Math.min(1,1280/Math.max(bmp.width,bmp.height));const c=document.createElement('canvas');c.width=Math.round(bmp.width*sc);c.height=Math.round(bmp.height*sc);c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);return await new Promise(r=>c.toBlob(r,'image/jpeg',0.82))}catch(e){return file}}
+async function diaryPhotos(sid){try{return (await idb.all()).filter(o=>o.s===sid).sort((a,b)=>a.t-b.t)}catch(e){return []}}
+async function drawDiaryPhotos(sid){const box=document.getElementById('dph-'+sid);if(!box)return;const ps=await diaryPhotos(sid);box.innerHTML='';
+  ps.forEach(o=>{const f=document.createElement('figure');const im=document.createElement('img');im.src=URL.createObjectURL(o.b);im.alt='Tu foto';const x=document.createElement('button');x.textContent='✕';x.setAttribute('aria-label','Borrar foto');x.onclick=async()=>{await idb.del(o.k);drawDiaryPhotos(sid)};f.append(im,x);box.appendChild(f)})}
+function bindDiary(s){const ta=document.getElementById('note-'+s.id);if(!ta)return;ta.value=notes[s.id]||'';let tm=0;ta.oninput=()=>{clearTimeout(tm);tm=setTimeout(()=>{const v=ta.value.trim();if(v)notes[s.id]=v;else delete notes[s.id];store.set('kdk-notes',notes)},400)};
+  const fi=document.getElementById('dfile-'+s.id);fi.onchange=async()=>{for(const f of fi.files){const b=await shrink(f);try{await idb.put({k:s.id+'-'+Date.now()+Math.random().toString(36).slice(2,6),s:s.id,t:Date.now(),b})}catch(e){}}fi.value='';drawDiaryPhotos(s.id)};drawDiaryPhotos(s.id)}
+/* ---------- MI VIAJE: pasaporte, plan por días, diario ---------- */
+let tripTab='pass';
+$$('#tripTabs button').forEach(b=>b.onclick=()=>{tripTab=b.dataset.tt;$$('#tripTabs button').forEach(x=>x.setAttribute('aria-selected',x===b?'true':'false'));renderTrip()});
+function ring(p){const r=26,c=2*Math.PI*r;return `<svg class="passring" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="${r}" fill="none" stroke="var(--line)" stroke-width="7"/><circle cx="32" cy="32" r="${r}" fill="none" stroke="var(--ok)" stroke-width="7" stroke-linecap="round" stroke-dasharray="${c*p} ${c}" transform="rotate(-90 32 32)"/><text x="32" y="37" text-anchor="middle" font-size="15" font-weight="700" fill="currentColor">${Math.round(p*100)}%</text></svg>`}
+function renderPass(){const all=ROUTES.flatMap(r=>r.main),got=all.filter(s=>done.has(s.id)).length,fullR=ROUTES.filter(r=>r.main.length&&r.main.every(s=>done.has(s.id)));
+  const nParts=ROUTES.flatMap(r=>r.stops).reduce((a,s)=>a+(s.parts||[]).length,0);
+  let h=`<div class="card block"><div class="passhead">${ring(all.length?got/all.length:0)}<div><b>Pasaporte de ${esc(CI.name)}</b><span>${got} de ${all.length} paradas selladas · ${fullR.length} de ${ROUTES.length} barrios completos</span></div></div>`;
+  ROUTES.forEach(r=>{const n=r.main.filter(s=>done.has(s.id)).length,full=n===r.main.length&&n>0;
+    h+=`<div class="prow${full?' full':''}"><h4>${esc(r.name)}<em>${full?'✓ completo':n+'/'+r.main.length}</em></h4><div class="stamps">${r.main.map((s,i)=>`<button class="stamp${done.has(s.id)?' got':''}" data-open="${s.id}" aria-label="${esc(s.name)}${done.has(s.id)?', sellada':''}">${done.has(s.id)?ico(s.icon||'check'):i+1}</button>`).join('')}</div></div>`});
+  const B=[[got>=1,'Primer sello'],[fullR.length>=1,'Primer barrio completo'],[got>=Math.ceil(all.length/2),'Media ciudad'],[fullR.length===ROUTES.length,'Ciudad completa'],[Object.keys(notes).some(k=>byId[k]),'Cronista: primera nota']];
+  h+=`<div class="badges">${B.map(([ok,t])=>`<span class="badge2${ok?'':' off'}">${ico(ok?'check':'clock')}${t}</span>`).join('')}</div><p class="fnote" style="margin-top:10px">Marca cada parada como «Hecha» para sellarla. ${nParts} rincones esperan dentro de los monumentos.</p></div>`;
+  $('#tripBox').innerHTML=h;$$('#tripBox .stamp').forEach(b=>b.onclick=()=>location.hash='p-'+b.dataset.open)}
+function routeHours(r){const P=r.plan||[];if(P.length>=2){const a=hm(P[0][0]),b=hm(P[P.length-1][0]);if(b>a)return Math.min(7,(b-a)/60+0.75)}return Math.max(2,r.main.length*0.45)}
+function routeClosedOn(r,wd){return r.main.filter(s=>s.hours&&(s.hours.off||[]).includes(wd)).map(s=>s.name)}
+let planCfg=store.get('kdk-plan',{days:3,start:''});
+function renderPlan(){const days=planCfg.days||3;const start=planCfg.start||todayISO();
+  let h=`<div class="card block"><div class="planform"><label>Días<select id="plDays">${[1,2,3,4,5,6,7].map(n=>`<option${n===days?' selected':''}>${n}</option>`).join('')}</select></label><label>Primer día<input type="date" id="plStart" value="${start}"></label></div>`;
+  const doneR=ROUTES.filter(r=>r.main.length&&r.main.every(s=>done.has(s.id)));const left=ROUTES.filter(r=>!doneR.includes(r));const out=[];const [Y,Mo,D]=start.split('-').map(Number);
+  for(let i=0;i<days;i++){const dt=new Date(Y,Mo-1,D+i);const wd=dt.getDay();let cap=7.5,day=[];
+    left.sort((a,b)=>routeHours(b)-routeHours(a));
+    for(const r of [...left]){const hh=routeHours(r);if(hh<=cap&&day.length<2&&routeClosedOn(r,wd).length===0){day.push(r);cap-=hh;left.splice(left.indexOf(r),1)}}
+    if(!day.length&&left.length){const r=left.shift();day.push(r)}
+    out.push({dt,wd,day})}
+  out.forEach(({dt,wd,day},di)=>{let t=9*60+30,lunch=false;h+=`<div class="pday"><h4>Día ${di+1} · ${dt.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'short'})}</h4>`;
+    if(!day.length)h+=`<p class="fnote">Día libre: repetid lo que más os haya gustado, entrad en algún museo o descansad.</p>`;
+    const meal=r=>{const pl=(CI.places||[]).filter(p=>p.zone===r.id&&(p.t||[]).includes('Comida'));const gf=(CI.gfPlaces||[]).filter(p=>p.zone===r.id&&!p.far);return `${pl.length?esc(pl[0].n)+' ('+esc(pl[0].z)+')':'En la zona de la ruta'}${gf.length?` · sin gluten: ${esc(gf[0].n)}`:''}`};
+    day.forEach(r=>{const hh=Math.round(routeHours(r)*60);const closed=routeClosedOn(r,wd);const L=13*60+30;
+      h+=`<div class="pslot"><span class="t">${mh(t)}</span><div><b><a href="#ruta" data-route="${r.id}">${esc(r.name)}</a></b><span>${r.main.length} paradas · ${esc(r.km)} · unas ${Math.round(hh/30)/2} h</span>${closed.length?`<p class="pwarn">Ojo: hoy cierra ${esc(closed.join(', '))}.</p>`:''}${wd===5&&r.main.some(s=>s.mosque)?'<p class="pwarn">Viernes: las mezquitas cierran a turistas más tiempo a mediodía.</p>':''}</div></div>`;
+      if(!lunch&&t<L&&t+hh>L){h+=`<div class="pslot"><span class="t">${mh(L)}</span><div><b>Pausa para comer</b><span>${meal(r)}</span></div></div>`;lunch=true;t+=hh+75}
+      else{t+=hh;if(!lunch&&t>=12*60&&t<=15*60){h+=`<div class="pslot"><span class="t">${mh(Math.max(t,L))}</span><div><b>Comida</b><span>${meal(r)}</span></div></div>`;lunch=true;t=Math.max(t,L)+75}}});
+    h+=`</div>`});
+  if(doneR.length)h+=`<p class="fnote" style="margin-top:12px">Ya completadas, no las incluyo: ${doneR.map(r=>esc(r.name)).join(', ')}.</p>`;
+  if(left.length)h+=`<p class="pwarn" style="margin-top:12px">No caben: ${left.map(r=>esc(r.name)).join(', ')}. Añade un día.</p>`;
+  h+=`<p class="fnote" style="margin-top:10px">Plan orientativo: evita los días de cierre conocidos y deja tiempo para comer. Las horas son aproximadas.</p></div>`;
+  $('#tripBox').innerHTML=h;
+  $('#plDays').onchange=e=>{planCfg.days=+e.target.value;store.set('kdk-plan',planCfg);renderPlan()};
+  $('#plStart').onchange=e=>{planCfg.start=e.target.value;store.set('kdk-plan',planCfg);renderPlan()};
+  $$('#tripBox [data-route]').forEach(a=>a.onclick=e=>{e.preventDefault();const r=routeById[a.dataset.route];if(r){R=r;store.set('strollo-route-'+CI.id,r.id);renderRoute();location.hash='ruta';scrollTo(0,0)}})}
+async function renderDiary(){const all=ROUTES.flatMap(r=>r.stops);let ph=[];try{ph=await idb.all()}catch(e){}
+  const withSomething=all.filter(s=>notes[s.id]||ph.some(o=>o.s===s.id));
+  let h=`<div class="card block">`;
+  if(!withSomething.length)h+=`<p class="fnote">Aún no has escrito nada. En cada parada tienes un apartado «Mi diario» para apuntar notas y guardar tus fotos. Se guardan solo en este móvil.</p>`;
+  withSomething.forEach(s=>{const n=ph.filter(o=>o.s===s.id).length;h+=`<div class="dentry"><b><a href="#p-${s.id}">${esc(s.name)}</a></b>${notes[s.id]?`<p>${esc(notes[s.id])}</p>`:''}${n?`<p class="fnote">${n} foto${n>1?'s':''}</p>`:''}</div>`});
+  if(withSomething.length)h+=`<div class="chips" style="margin-top:10px"><button class="chip primary" id="dShare">Compartir mi diario</button></div>`;
+  h+=`</div>`;$('#tripBox').innerHTML=h;
+  const b=$('#dShare');if(b)b.onclick=async()=>{const txt=`Mi viaje por ${CI.name} con Strollo\n\n`+withSomething.map(s=>`• ${s.name}${notes[s.id]?`\n  ${notes[s.id]}`:''}`).join('\n')+`\n\nhttps://strollo-app.github.io`;
+    try{if(navigator.share){await navigator.share({title:'Mi viaje · '+CI.name,text:txt});return}}catch(e){return}
+    try{await navigator.clipboard.writeText(txt);b.textContent='Copiado'}catch(e){}}}
+function renderTrip(){if(tripTab==='plan')renderPlan();else if(tripTab==='diary')renderDiary();else renderPass()}
 /* ---------- PLANO DE RINCONES ---------- */
 function planSVG(s){const P=s.plan,[W,H]=P.vb;const sh=(P.shapes||[]).map(o=>{const c=`pl-${o.c||'area'}`;
   if(o.t==='rect')return `<rect class="${c}" x="${o.x}" y="${o.y}" width="${o.w}" height="${o.h}" rx="${o.r||0}"/>`;
@@ -2153,7 +2230,7 @@ function route(){
   $$('.tabs a').forEach(a=>{if(a.dataset.tab===tab)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
   if(tab==='mapa')setTimeout(initMap,30);
   if(tab==='comer'){zone=R.id;renderFood()}
-  if(tab==='info')offlineState();
+  if(tab==='info'){offlineState();try{renderTrip()}catch(e){console.error(e)}}
   if(gf)showSeg('gf');
   window.scrollTo(0,0);
 }
