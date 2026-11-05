@@ -871,6 +871,7 @@ main{padding-bottom:calc(var(--tabs) + var(--dock) + env(safe-area-inset-bottom,
 .stsub{margin:4px 0 0 22px;color:var(--muted);font-size:13.5px;line-height:1.4}
 .prtimes{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin:10px 0 2px}.prtimes div{text-align:center;border-radius:10px;padding:6px 2px;background:var(--raise)}
 .prtimes small{display:block;font-size:10.5px;color:var(--muted)}.prtimes b{font:600 13px var(--mono,monospace)}.prtimes div.now{background:color-mix(in srgb,#D93025 18%,var(--raise))}.prtimes div.next{outline:1.5px solid var(--stripe)}
+.pack .offbar{height:4px;border-radius:2px;background:var(--line);margin-top:8px;overflow:hidden}.pack .offbar i{display:block;height:100%;background:var(--ok)}.pack .chip{align-self:center}
 .parts h3{margin-bottom:2px}
 .plan{margin:4px 0 14px;border:1px solid var(--line);border-radius:16px;background:var(--raise);overflow:hidden}
 .plan svg{display:block;width:100%;height:auto;touch-action:manipulation}
@@ -1250,6 +1251,7 @@ button.go{border:0;background:transparent;cursor:pointer;padding:2px 0;font:inhe
    <div class="hero" id="hero"></div>
    <div class="card intro" id="introCard"></div>
    <div class="card intro" id="nearCard"></div>
+   <div class="card intro pack" id="packCard"></div>
    <div class="alerts" id="alerts"></div>
 
    <div class="sec-title"><h2>Plan del día</h2><span class="eyebrow">Orientativo</span></div>
@@ -1446,7 +1448,7 @@ function renderRoute(){
   $('#alerts').innerHTML=R.alerts.filter(a=>!a.day||a.day===t).map(a=>`<div class="card alert${a.hot?' today':''}"><div class="badge">${ico(a.icon)}</div><p><strong>${esc(a.t)}</strong>${esc(a.d)}</p></div>`).join('')+
     `<a class="card alert" href="#singluten" style="text-decoration:none;border-color:var(--ok)"><div class="badge" style="background:var(--ok-soft);color:var(--ok);font:600 .8rem var(--f-mono)">GF</div><p><strong>Sin gluten</strong>${esc(CO.gf.alertText||'Sitios seguros en cada zona y qué platos vigilar.')}</p></a>`;
   $('#plan').innerHTML=R.plan.map(p=>`<div class="card slot"><span class="t">${p[0]}</span><b>${esc(p[1])}</b><span>${esc(p[2])}</span></div>`).join('');
-  renderList();bindPlay($('#v-ruta'));setUI();
+  renderList();bindPlay($('#v-ruta'));setUI();setTimeout(renderPack,0);
 }
 function renderList(){
   $('#list').innerHTML=R.stops.map(s=>{
@@ -2106,6 +2108,22 @@ $$('[data-copy]').forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.w
 /* ---------- OFFLINE ---------- */
 const canOffline='serviceWorker' in navigator && 'caches' in window && /github\.io$/.test(location.hostname);
 const ALL_FILES=['./','./index.html','./sw.js','./data/countries.json',CO.file,'./manifest.json','./icons/apple-touch-icon.png','./icons/icon-192.png',...Object.values(byId).filter(s=>!s.isMore).map(s=>s.file),...Object.values(TR),'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js','./vendor/leaflet-rotate.js'];
+/* ---------- PAQUETE SIN CONEXIÓN POR RUTA ---------- */
+function packFiles(r){const fs=[],ph=[];let bytes=0;const add=(f,b)=>{if(f&&!fs.includes(f)){fs.push(f);bytes+=b||0}};
+  add(r.intro.file,r.intro.dur*7000);
+  r.stops.forEach(s=>{add(s.file,s.dur*7000);if(s.more)add(s.more.file,s.more.dur*5000);(s.parts||[]).forEach(p=>{add(p.file,p.dur*5000);if(p.photo){ph.push(pphUrl(p.photo,160),pphUrl(p.photo,800));bytes+=170000}});
+    const P=photos[s.id];if(P&&P.big){ph.push(P.big,P.small);bytes+=200000}});
+  return {fs,ph,bytes}}
+async function packDone(r){try{const c=await caches.open('kdk-v3');const {fs,ph}=packFiles(r);let n=0;for(const f of [...fs,...ph])if(await c.match(f))n++;return n/(fs.length+ph.length)}catch(e){return 0}}
+async function renderPack(){const el=$('#packCard');if(!el)return;if(!('serviceWorker' in navigator&&'caches' in window&&/github\.io$/.test(location.hostname))){el.hidden=true;return}el.hidden=false;
+  const r=R,{fs,ph,bytes}=packFiles(r),mb=Math.max(1,Math.round(bytes/1e6));const f=await packDone(r);if(r!==R)return;const full=f>=0.99;
+  el.innerHTML=`<div class="art" style="${full?'background:var(--ok-soft);color:var(--ok)':''}">${ico(full?'check':'download')}</div><div><b>${full?'Ruta descargada al completo':'Descargar esta ruta completa'}</b><span id="packMsg">${full?'Audios, «Más historia», rincones y fotos listos sin conexión.':`Todo para usarla sin internet: audios, «Más historia», rincones y fotos. Unos ${mb} MB${f>0.05?` · ${Math.round(f*100)} % ya guardado`:''}. Mejor con wifi.`}</span><div class="offbar"><i id="packBar" style="width:${Math.round(f*100)}%"></i></div></div>${full?'':`<button class="chip primary" id="packBtn">Descargar</button>`}`;
+  const b=$('#packBtn');if(b)b.onclick=async()=>{b.disabled=true;b.textContent='Descargando…';
+    try{await navigator.serviceWorker.register('./sw.js');const c=await caches.open('kdk-v3');const all=[...fs.map(x=>[x,0]),...ph.map(x=>[x,1])];let n=0,bad=0;
+      for(const [u,img] of all){try{if(!(await c.match(u))){const res=await fetch(u,img?{mode:'no-cors'}:{mode:'same-origin'});if(res.ok||res.type==='opaque')await c.put(u,res.clone());else bad++}}catch(e){bad++}
+        n++;const bb=$('#packBar');if(bb)bb.style.width=Math.round(n/all.length*100)+'%';const m=$('#packMsg');if(m)m.textContent=`Descargando… ${n} de ${all.length}`}
+      if(bad){const m=$('#packMsg');if(m)m.textContent=`Faltan ${bad} archivos. Vuelve a pulsar con mejor conexión.`}}catch(e){}
+    if(!$('#packMsg')||!/Faltan/.test($('#packMsg').textContent))renderPack();else{b.disabled=false;b.textContent='Reintentar'}}}
 async function offlineState(){
   if(!canOffline){$('#offline').innerHTML=`<div class="art">${ico('download')}</div><div><b>Uso sin conexión</b><span>Disponible al abrir la web desde el enlace de GitHub (no desde esta vista previa).</span></div>`;return}
   let n=0;try{const c=await caches.open('kdk-v3');for(const f of ALL_FILES){if(await c.match(f))n++}}catch(e){}
