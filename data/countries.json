@@ -46,6 +46,14 @@
     "stops": 12,
     "photo": "Catedral de Albacete.jpg",
     "desc": "Modernismo, navajas, la catedral de los cuatro siglos y la Feria con forma de sartén."
+   },
+   {
+    "id": "madrid",
+    "name": "Madrid",
+    "routes": 2,
+    "stops": 12,
+    "photo": "Gran Vía (Madrid), desde Callao.jpg",
+    "desc": "La Puerta del Sol, la Plaza Mayor, el Palacio Real, el Prado, el Retiro y el Barrio de las Letras."
    }
   ]
  },
