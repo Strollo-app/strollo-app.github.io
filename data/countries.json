@@ -54,6 +54,22 @@
     "stops": 12,
     "photo": "Gran Vía (Madrid), desde Callao.jpg",
     "desc": "La Puerta del Sol, la Plaza Mayor, el Palacio Real, el Prado, el Retiro y el Barrio de las Letras."
+   },
+   {
+    "id": "barcelona",
+    "name": "Barcelona",
+    "routes": 2,
+    "stops": 12,
+    "photo": "Park Güell 02.jpg",
+    "desc": "La Rambla, el Barrio Gótico, Santa Maria del Mar, el Palau de la Música y la Barcelona de Gaudí: Casa Batlló, La Pedrera, la Sagrada Família y el Park Güell."
+   },
+   {
+    "id": "sevilla",
+    "name": "Sevilla",
+    "routes": 2,
+    "stops": 11,
+    "photo": "",
+    "desc": "La catedral y la Giralda, el Real Alcázar, el barrio de Santa Cruz, la Plaza de España, Triana y el río Guadalquivir."
    }
   ]
  },
