@@ -980,6 +980,10 @@ details.script p{margin:.8em 0 0;max-width:65ch;color:var(--ink)}
 .rchip small{font-family:var(--f-mono);font-size:.64rem;color:var(--muted)}
 .rchip span{min-width:0;max-width:100%}
 .rchip[aria-pressed="true"]{background:var(--sea);border-color:var(--sea);color:var(--sea-ink)}
+.rchip.done{border:2px solid var(--ok,#2E8B57);box-shadow:inset 0 -4px 0 var(--ok,#2E8B57)}
+.rchip.done small{color:var(--ok,#2E8B57);font-weight:700;display:inline-flex;align-items:center;gap:3px}.rchip.done small .ico{width:12px;height:12px;color:inherit}
+.rchip.done .ico{color:var(--ok,#2E8B57)}
+.rchip.done[aria-pressed="true"]{box-shadow:inset 0 -5px 0 var(--ok,#2E8B57)}.rchip.done[aria-pressed="true"] small{color:#7EE0A3}
 .rchip[aria-pressed="true"] .ico{color:var(--stripe)}
 .rchip[aria-pressed="true"] small{color:color-mix(in srgb,var(--sea-ink) 75%,transparent)}
 .qscore{display:flex;gap:10px;align-items:center;font-size:.85rem;color:var(--muted);background:var(--raise);border-radius:12px;padding:10px 12px;margin-bottom:12px}
@@ -1420,7 +1424,7 @@ const saveQuiz=()=>store.set('kdk-quiz',quiz);
 
 /* ---------- RUTA ---------- */
 function renderRouteChips(){
-  $('#routeChips').innerHTML=ROUTES.map(r=>{const n=r.main.filter(s=>done.has(s.id)).length;return `<button class="rchip" data-route="${r.id}" aria-pressed="${r===R}">${ico(r.icon)}<span><b>${esc(r.short)}</b><small>${n}/${r.main.length}</small></span></button>`}).join('');
+  $('#routeChips').innerHTML=ROUTES.map(r=>{const n=r.main.filter(s=>done.has(s.id)).length;const full=r.main.length&&n===r.main.length;return `<button class="rchip${full?' done':''}" data-route="${r.id}" aria-pressed="${r===R}"${full?` aria-label="${esc(r.short)}, completada"`:''}>${ico(r.icon)}<span><b>${esc(r.short)}</b><small>${full?ico('check')+' ':''}${n}/${r.main.length}</small></span></button>`}).join('');
   $$('[data-route]').forEach(b=>b.onclick=()=>setRoute(b.dataset.route));
 }
 function setRoute(id,keepScroll){R=routeById[id];store.set('strollo-route-'+CI.id,id);if(map&&foodOn)setTimeout(()=>drawFood(),0);if(audio.paused&&byId[cur].isIntro)cur=R.intro.id;renderRoute();if(map)drawRoute(true);if(!keepScroll)window.scrollTo(0,0)}
