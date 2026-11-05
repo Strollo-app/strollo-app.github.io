@@ -1795,7 +1795,7 @@ function pcOpen(){let el=$('#pcSheet');if(!el){el=document.createElement('div');
   <input id="pcName" class="pcname" maxlength="26" placeholder="Tu nombre" value="${esc(nm)}"></div>
   <canvas id="pcCv" width="1080" height="1920"></canvas>
   <div class="chips pcact"><button class="chip primary" id="pcShare">${ico('share')}Compartir</button><button class="chip" id="pcDl">Descargar</button></div>
-  <p class="fnote">Tu foto no sale del móvil: la tarjeta se crea aquí mismo. Cada parada marcada como «Hecha» es un sello.</p></div>`;
+  <p class="fnote">Tu foto no sale del móvil: la tarjeta se crea aquí mismo. Cada barrio completado es un sello.</p></div>`;
   el.hidden=false;document.body.style.overflow='hidden';
   const close=()=>{el.hidden=true;document.body.style.overflow=''};
   $('#pcClose').onclick=close;el.onclick=e=>{if(e.target===el)close()};
@@ -1828,17 +1828,16 @@ function pcDraw(){const cv=$('#pcCv');if(!cv)return;const c=cv.getContext('2d'),
   c.restore();c.strokeStyle='#1F4555';c.lineWidth=4;rr(c,px,py,pw,ph,22);c.stroke();
   // datos
   const fx=480;let fy=250;const field=(l,v,big)=>{c.fillStyle='#7C6F5A';c.font=`600 22px ${M}`;c.fillText(l,fx,fy);fy+=big?62:52;c.fillStyle='#12202A';c.font=big?`52px ${D}`:`600 38px ${B}`;fitText(c,v,fx,fy,W-120-fx-40);fy+=big?60:56};
-  field('NOMBRE / NAME',name,true);field('CIUDAD / CITY',CI.name);field('FECHA / DATE',dateS);field('SELLOS / STAMPS',`${got.length} de ${all.length} paradas`);if(fullR.length){c.fillStyle='#2E7D4F';c.font=`600 28px ${B}`;c.fillText(`✓ ${fullR.length} barrio${fullR.length>1?'s':''} completo${fullR.length>1?'s':''}`,fx,fy-6)}
+  field('NOMBRE / NAME',name,true);field('CIUDAD / CITY',CI.name);field('FECHA / DATE',dateS);field('BARRIOS / AREAS',`${fullR.length} de ${ROUTES.length} completos`);c.fillStyle='#7C6F5A';c.font=`500 26px ${B}`;c.fillText(`${got.length} de ${all.length} paradas visitadas`,fx,fy-6);
   // sellos
   const ink=['#B8322A','#1F5F8B','#2E7D4F','#7A3E9D','#C2621B','#1F4555'];
-  const top=760,left=40,cols=3,cw=(W-120-left*2)/cols,rh=270;
-  const list=[{t:'ENTRADA',m:CI.name,b:dateS,big:1}].concat(got.map(s=>({t:CI.name.toUpperCase(),m:s.name,b:'STROLLO'})));
-  const max=cols*3;const show=list.slice(0,max);
-  show.forEach((st,i)=>{const col=i%cols,row=Math.floor(i/cols);const seed=[...(st.m+i)].reduce((a,ch)=>a*31+ch.charCodeAt(0)>>>0,7);
-    const x=left+cw*col+cw/2+((seed%40)-20),y=top+rh*row+rh/2+((seed>>3)%30-15),rot=((seed>>5)%36-18)*Math.PI/180;
-    stampDraw(c,x,y,st.big?122:112,st.t,st.m,st.b,ink[(seed>>2)%ink.length],rot,D,M)});
-  if(list.length>max){c.fillStyle='#1F4555';c.font=`600 30px ${B}`;c.textAlign='center';c.fillText(`+ ${list.length-max} sellos más`,(W-120)/2,top+rh*3+20);c.textAlign='left'}
-  if(!got.length){c.fillStyle='#7C6F5A';c.font=`500 30px ${B}`;c.textAlign='center';c.fillText('Marca paradas como «Hecha» para ganar sellos',(W-120)/2,top+rh+170);c.textAlign='left'}
+  const list=[{t:'ENTRADA',m:CI.name,b:dateS}].concat(fullR.map(r=>({t:CI.name.toUpperCase(),m:r.name,b:'COMPLETADO'})));
+  const n=list.length,cols=n<=4?2:3,rad=n<=2?165:n<=4?150:112,top=n<=2?1000:770,left=40,cw=(W-120-left*2)/cols,rows=Math.ceil(n/cols),rh=Math.min(n<=4?340:270,(1560-top)/Math.max(rows,1));
+  list.slice(0,cols*Math.floor((1580-top)/rh)).forEach((st,i)=>{const col=i%cols,row=Math.floor(i/cols);const seed=[...(st.m+i)].reduce((a,ch)=>a*31+ch.charCodeAt(0)>>>0,7);
+    const inRow=Math.min(cols,n-row*cols),off=(cols-inRow)*cw/2;
+    const x=left+off+cw*col+cw/2+((seed%30)-15),y=top+rh*row+rh/2+((seed>>3)%24-12),rot=((seed>>5)%30-15)*Math.PI/180;
+    stampDraw(c,x,y,rad,st.t,st.m,st.b,ink[(seed>>2)%ink.length],rot,D,M,rad/112)});
+  if(!fullR.length){c.fillStyle='#7C6F5A';c.font=`500 30px ${B}`;c.textAlign='center';c.fillText('Completa un barrio para ganar su sello',(W-120)/2,1330);c.textAlign='left'}
   // zona MRZ
   const mrz=s=>s.normalize('NFD').replace(/[^A-Za-z0-9 ]/g,'').toUpperCase().replace(/ +/g,'<');
   const l1=('P<'+mrz(CI.name).slice(0,12)+'<<'+mrz(name)).padEnd(40,'<').slice(0,40),l2=('STROLLO<APP<'+String(got.length).padStart(2,'0')+'<'+String(all.length).padStart(2,'0')+'<'+mrz(dateS)).padEnd(40,'<').slice(0,40);
@@ -1849,13 +1848,13 @@ function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);
 function fitText(c,t,x,y,mw){let f=c.font,sz=parseInt(f.match(/(\d+)px/)[1]);while(c.measureText(t).width>mw&&sz>18){sz-=2;c.font=f.replace(/\d+px/,sz+'px')}c.fillText(t,x,y)}
 function arcText(c,t,r,mid,inv){c.save();const ws=[...t].map(ch=>c.measureText(ch).width+3);const tot=ws.reduce((x,y)=>x+y,0)/r;let a=mid+(inv?tot/2:-tot/2);
   [...t].forEach((ch,i)=>{const h=ws[i]/r/2;a+=inv?-h:h;c.save();c.rotate(a);c.translate(0,-r);if(inv)c.rotate(Math.PI);c.fillText(ch,0,0);c.restore();a+=inv?-h:h});c.restore()}
-function stampDraw(c,x,y,r,top,mid,bot,col,rot,D,M){c.save();c.translate(x,y);c.rotate(rot);c.globalAlpha=.88;c.strokeStyle=col;c.fillStyle=col;
-  c.lineWidth=6;c.beginPath();c.arc(0,0,r,0,7);c.stroke();c.lineWidth=2.5;c.beginPath();c.arc(0,0,r-12,0,7);c.stroke();c.beginPath();c.arc(0,0,r-44,0,7);c.stroke();
-  c.textAlign='center';c.textBaseline='middle';c.font=`600 19px ${M}`;arcText(c,top.slice(0,16),r-28,0,false);arcText(c,bot.slice(0,16),r-28,Math.PI,true);
-  c.beginPath();c.arc(-(r-28),0,3,0,7);c.arc(r-28,0,3,0,7);c.fill();
+function stampDraw(c,x,y,r,top,mid,bot,col,rot,D,M,k=1){c.save();c.translate(x,y);c.rotate(rot);c.globalAlpha=.88;c.strokeStyle=col;c.fillStyle=col;
+  c.lineWidth=6;c.beginPath();c.arc(0,0,r,0,7);c.stroke();c.lineWidth=2.5;c.beginPath();c.arc(0,0,r-12,0,7);c.stroke();c.beginPath();c.arc(0,0,r-44*k,0,7);c.stroke();
+  c.textAlign='center';c.textBaseline='middle';c.font=`600 ${Math.round(19*k)}px ${M}`;arcText(c,top.slice(0,16),r-28*k,0,false);arcText(c,bot.slice(0,16),r-28*k,Math.PI,true);
+  c.beginPath();c.arc(-(r-28*k),0,3*k,0,7);c.fill();c.beginPath();c.arc(r-28*k,0,3*k,0,7);c.fill();
   const words=mid.split(' ');let lines=[''];for(const w of words){const cur=lines[lines.length-1];if(cur&&(cur+' '+w).length>10)lines.push(w);else lines[lines.length-1]=(cur+' '+w).trim()}
   if(lines.length>3){lines=lines.slice(0,3);lines[2]+='…'}
-  const fs=lines.length>2?18:lines.length>1?21:25;c.font=`${fs}px ${D}`;lines.forEach((l,i)=>{let f=fs;while(c.measureText(l).width>(r-50)*2&&f>12){f--;c.font=`${f}px ${D}`}c.fillText(l,0,(i-(lines.length-1)/2)*fs*1.08);c.font=`${fs}px ${D}`});
+  const fs=Math.round((lines.length>2?18:lines.length>1?21:25)*k);c.font=`${fs}px ${D}`;lines.forEach((l,i)=>{let f=fs;while(c.measureText(l).width>(r-50*k)*2&&f>12){f--;c.font=`${f}px ${D}`}c.fillText(l,0,(i-(lines.length-1)/2)*fs*1.08);c.font=`${fs}px ${D}`});
   c.fillStyle='#F4ECDC';c.globalAlpha=.55;for(let k=0;k<26;k++){const a=k*2.399,d=((k*37)%100)/100*r;c.beginPath();c.arc(Math.cos(a)*d,Math.sin(a)*d,1.5+(k%3),0,7);c.fill()}
   c.restore()}
 function routeHours(r){const P=r.plan||[];if(P.length>=2){const a=hm(P[0][0]),b=hm(P[P.length-1][0]);if(b>a)return Math.min(7,(b-a)/60+0.75)}return Math.max(2,r.main.length*0.45)}
