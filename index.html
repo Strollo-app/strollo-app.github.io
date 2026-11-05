@@ -1736,12 +1736,15 @@ function init3D(s,name){const T=window.THREE;if(m3)close3D(),$('#m3d').hidden=fa
     m3.raf=requestAnimationFrame(loop)};
   m3={r,rs,raf:0};loop()}
 /* ---------- PHOTOS (Wikimedia Commons) ---------- */
-let pph=store.get('kdk-pph2',{});
+let pph=store.get('kdk-pph3',{});
 function pphUrl(f,w){return 'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(f.replace(/ /g,'_'))+'?width='+w}
-async function pphFile(p){if(p.photo)return p.photo;if(!p.photoQ)return null;if(pph[p.photoQ]!==undefined)return pph[p.photoQ];
-  try{const u='https://commons.wikimedia.org/w/api.php?action=query&list=search&srnamespace=6&srlimit=5&format=json&origin=*&srsearch='+encodeURIComponent(p.photoQ+' filetype:bitmap');
-    const j=await (await fetch(u)).json();const t=(j.query.search||[]).map(x=>x.title.replace(/^File:/,'')).find(x=>/\.(jpe?g|png)$/i.test(x))||null;pph[p.photoQ]=t;store.set('kdk-pph2',pph);return t}catch(e){return null}}
-function loadPartPhotos(sh,s){(s.parts||[]).forEach(async p=>{const f=await pphFile(p);if(!f)return;
+async function pphSearch(q){try{const u='https://commons.wikimedia.org/w/api.php?action=query&list=search&srnamespace=6&srlimit=8&format=json&origin=*&srsearch='+encodeURIComponent(q+' filetype:bitmap');
+    const j=await (await fetch(u)).json();return (j.query.search||[]).map(x=>x.title.replace(/^File:/,'')).find(x=>/\.(jpe?g|png)$/i.test(x))||null}catch(e){return undefined}}
+async function pphFile(p,s){if(p.photo)return p.photo;if(!p.photoQ)return null;if(pph[p.photoQ])return pph[p.photoQ];
+  const w=p.photoQ.split(/\s+/),qs=[];for(let n=w.length;n>=2;n--)qs.push(w.slice(0,n).join(' '));if(s&&s.tr)qs.push(s.tr);
+  for(const q of qs){const t=await pphSearch(q);if(t===undefined)return null;if(t){pph[p.photoQ]=t;store.set('kdk-pph3',pph);return t}}
+  return (s&&(CI.photos||{})[s.id])||null}
+function loadPartPhotos(sh,s){(s.parts||[]).forEach(async p=>{const f=await pphFile(p,s);if(!f)return;
   const th=sh.querySelector(`[data-pph="${s.id}|${p.id}"]`);if(th)th.style.backgroundImage=`url("${pphUrl(f,160)}")`;
   const big=sh.querySelector(`[data-pphbig="${s.id}|${p.id}"]`);if(big)big.innerHTML=`<img loading="lazy" alt="${esc(p.name)}" src="${pphUrl(f,800)}"><figcaption>Foto: <a href="https://commons.wikimedia.org/wiki/File:${encodeURIComponent(f.replace(/ /g,'_'))}" target="_blank" rel="noopener">Wikimedia Commons</a></figcaption>`})}
 const PH=CI.photoCands||{};

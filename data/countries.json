@@ -99,5 +99,22 @@
     "desc": "El Castillo de Buda, el Parlamento, el barrio judío, la avenida Andrássy y los baños termales."
    }
   ]
+ },
+ {
+  "id": "gr",
+  "name": "Grecia",
+  "file": "data/gr.json",
+  "photo": "The Parthenon in Athens.jpg",
+  "desc": "Templos, dioses, filosofía y tabernas al sol.",
+  "cities": [
+   {
+    "id": "atenas",
+    "name": "Atenas",
+    "routes": 3,
+    "stops": 18,
+    "photo": "The Parthenon in Athens.jpg",
+    "desc": "La Acrópolis y el Partenón, el ágora de Sócrates, Plaka y Monastiraki, el cambio de guardia y el estadio de mármol."
+   }
+  ]
  }
 ]
