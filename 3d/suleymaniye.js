@@ -66,7 +66,7 @@ window.STROLLO3D.suleymaniye=function(T,scene){
   for(let i=0;i<32;i++){const a=i/32*Math.PI*2;archWin(Math.sin(a)*14.25,H+th+0.6,Math.cos(a)*14.25,1.2,3.2,a,shell)}
   dome(13.9,lead,0,H+th+4.5,0,shell,32);alem(0,H+th+4.5+13.9,0,1.8,shell);
   // semicúpulas en el eje de la qibla
-  [[-1,0],[1,Math.PI]].forEach(([sz,rot])=>{const o=add(new T.SphereGeometry(13,24,10,0,Math.PI,0,Math.PI/2),lead,0,H+th-1,sz*16,shell);o.rotation.y=rot+Math.PI/2*0;o.rotation.y=sz<0?Math.PI/2:-Math.PI/2;
+  [[-1,0],[1,Math.PI]].forEach(([sz,rot])=>{const o=add(new T.SphereGeometry(13,24,10,0,Math.PI,0,Math.PI/2),lead,0,H+th-1,sz*16,shell);o.rotation.y=sz<0?Math.PI:0;
     box(28,th-1,1,stoneM(3,1),0,H,sz*(tw/2+0.6),shell)});
   // cupulitas laterales sobre las galerías interiores
   [-1,1].forEach(sx=>{for(let i=0;i<5;i++){const z=-20+i*10;cyl(3.6,1.6,stone2,sx*21.5,H+1,z,12,shell);dome(3.6,lead,sx*21.5,H+2.6,z,shell,16);alem(sx*21.5,H+6.2,z,0.45,shell)}});
