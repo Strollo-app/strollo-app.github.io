@@ -691,6 +691,12 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .pctop{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.pctop b{font-size:18px}
 .pcform{display:flex;gap:8px;align-items:center;margin-bottom:12px}.pcname{flex:1;min-width:0;font:inherit;padding:10px 12px;border-radius:12px;border:1px solid var(--line,#ccd);background:var(--raise,#fff);color:inherit}
 #pcCv{width:100%;height:auto;display:block;border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,.18)}.pcact{margin:12px 0 6px}
+.zcard{padding:14px}.zhead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}.zhead b{display:block;font-size:15.5px;margin-top:2px}.zhead .chip{white-space:nowrap;flex:none}
+.zmapbox{height:230px;border-radius:12px;overflow:hidden;background:#E8EEF0;z-index:0}
+.zlab{background:none;border:0}.zlab span{display:inline-block;transform:translate(-50%,-50%);white-space:nowrap;color:#fff;font:600 12px/1 var(--f-body,system-ui);padding:5px 8px;border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.zlist{display:flex;flex-direction:column;gap:6px;margin-top:10px}.zhere{margin:0 0 4px;font-size:14px;display:flex;align-items:center;gap:6px}.zhere .ico{width:16px;height:16px}
+.zrow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;font:inherit;color:inherit;background:var(--raise,#fff);border:1px solid var(--line,#dde);border-radius:12px;padding:9px 11px;cursor:pointer}
+.zrow.on{border-color:var(--sea,#1F4555);box-shadow:inset 0 0 0 1px var(--sea,#1F4555)}.zrow i{width:12px;height:12px;border-radius:50%;flex:none}.zrow span{flex:1;min-width:0}.zrow b{display:block;font-size:14px}.zrow small{display:block;font-size:12px;opacity:.75}.zrow em{font-style:normal;font-size:12.5px;font-weight:600;white-space:nowrap;opacity:.85}
 </style>
 <style>
 /* Layout: a phone-first app. Sticky top bar, four tabbed views (Ruta, Mapa, Comer, Info), a full-screen stop sheet, and a docked player above the tab bar. Identity: Şehir Hatları ferry — Marmara blue, ferry-funnel yellow, çay amber. */
@@ -1270,6 +1276,7 @@ button.go{border:0;background:transparent;cursor:pointer;padding:2px 0;font:inhe
  <section class="view" id="v-ruta" aria-label="Ruta">
   <div class="pad"><div class="inner stack">
    <div class="rchips" id="routeChips" role="group" aria-label="Elegir ruta"></div>
+   <div class="card zcard" id="zoneMap" hidden></div>
    <div class="hero" id="hero"></div>
    <div class="card intro" id="introCard"></div>
    <div class="card intro" id="nearCard"></div>
@@ -1470,9 +1477,46 @@ let quiz=store.get('kdk-quiz',{});
 const saveQuiz=()=>store.set('kdk-quiz',quiz);
 
 /* ---------- RUTA ---------- */
+/* ---- Mapa de barrios de la ciudad ---- */
+const ZCOL=['#1F6F8B','#C2621B','#2E7D4F','#7A3E9D','#B8322A','#1F4555','#8A6D1D','#2C5AA0'];
+let zmap=null,zCity=null,zLayers={},zPos=null,zMe=null;
+try{const p=JSON.parse(sessionStorage.getItem('strollo-zpos')||'null');if(p&&Date.now()-p.t<15*60000)zPos=p}catch(e){}
+function zHull(pts){if(pts.length<3)return pts;const P=[...pts].sort((a,b)=>a[1]-b[1]||a[0]-b[0]);const cr=(o,a,b)=>(a[1]-o[1])*(b[0]-o[0])-(a[0]-o[0])*(b[1]-o[1]);
+  const lo=[],up=[];for(const p of P){while(lo.length>=2&&cr(lo[lo.length-2],lo[lo.length-1],p)<=0)lo.pop();lo.push(p)}for(const p of P.slice().reverse()){while(up.length>=2&&cr(up[up.length-2],up[up.length-1],p)<=0)up.pop();up.push(p)}return lo.slice(0,-1).concat(up.slice(0,-1))}
+function zPad(h){const c=[h.reduce((a,p)=>a+p[0],0)/h.length,h.reduce((a,p)=>a+p[1],0)/h.length];return h.map(p=>[c[0]+(p[0]-c[0])*1.18+(p[0]>=c[0]?.0006:-.0006),c[1]+(p[1]-c[1])*1.18+(p[1]>=c[1]?.0008:-.0008)])}
+function zFmt(m){return m<950?`a ${Math.max(50,Math.round(m/50)*50)} m`:m<50000?`a ${(m/1000).toFixed(1).replace('.',',')} km`:'lejos de aquí'}
+function zDist(r){if(!zPos)return null;return Math.min(...r.stops.map(s=>distM(zPos.lat,zPos.lng,s.lat,s.lng)))}
+function renderZoneMap(){const box=$('#zoneMap');if(!box)return;if(ROUTES.length<2){box.hidden=true;return}box.hidden=false;
+  if(zCity!==CI.id){zCity=CI.id;if(zmap){zmap.remove();zmap=null}zLayers={};zMe=null;
+    box.innerHTML=`<div class="zhead"><div><span class="eyebrow">Los barrios de ${esc(CI.name)}</span><b>¿Dónde estás y qué tienes cerca?</b></div><button class="chip" id="zLoc">${ico('locate')}Ubicarme</button></div>
+    <div class="zmapbox" id="zmapBox" aria-label="Mapa de los barrios"></div><div class="zlist" id="zList"></div><p class="fnote" id="zNote"></p>`;
+    $('#zLoc').onclick=()=>{$('#zNote').textContent='Buscando tu ubicación…';getPos(p=>{zPos={lat:p.coords.latitude,lng:p.coords.longitude,t:Date.now()};try{sessionStorage.setItem('strollo-zpos',JSON.stringify(zPos))}catch(e){}$('#zNote').textContent='';zDraw(true)},e=>{$('#zNote').textContent=geoMsg?geoMsg(e):'No se pudo obtener tu ubicación.'})};
+    if(typeof L!=='undefined'){try{zmap=L.map('zmapBox',{zoomControl:false,attributionControl:false,rotate:false,rotateControl:false,touchRotate:false,scrollWheelZoom:false,tap:true});
+      let zi=0,zok=0,zbad=0,zt=null;const ZP=['https://{s}.basemap.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png','https://tile.openstreetmap.org/{z}/{x}/{y}.png'];
+      const zuse=()=>{if(zt)zmap.removeLayer(zt);zok=0;zbad=0;zt=L.tileLayer(ZP[zi],{maxZoom:18,subdomains:'abcd'}).addTo(zmap);zt.on('tileload',()=>zok++);zt.on('tileerror',()=>{zbad++;if(zbad>=3&&!zok&&zi<ZP.length-1){zi++;zuse()}});setTimeout(()=>{if(!zok&&zi<ZP.length-1){zi++;zuse()}},6000)};zuse();
+      ROUTES.forEach((r,i)=>{const col=ZCOL[i%ZCOL.length];const pts=r.stops.map(s=>[s.lat,s.lng]);const g=L.layerGroup().addTo(zmap);
+        const poly=pts.length>=3?L.polygon(zPad(zHull(pts)),{color:col,weight:2,fillColor:col,fillOpacity:.16,smoothFactor:2}):L.polyline(pts,{color:col,weight:8,opacity:.4});
+        poly.addTo(g);const c=poly.getBounds().getCenter();
+        const lab=L.marker(c,{icon:L.divIcon({className:'zlab',html:`<span style="background:${col}">${esc(r.short)}</span>`,iconSize:null}),keyboard:false}).addTo(g);
+        const go=()=>{setRoute(r.id)};poly.on('click',go);lab.on('click',go);zLayers[r.id]={poly,col}});
+      setTimeout(()=>{zmap.invalidateSize();zmap.fitBounds(L.featureGroup(Object.values(zLayers).map(x=>x.poly)).getBounds(),{padding:[18,18]})},60)}catch(e){console.error(e);$('#zmapBox').hidden=true}}
+    else $('#zmapBox').hidden=true;
+    if(!zPos&&navigator.permissions&&navigator.permissions.query)navigator.permissions.query({name:'geolocation'}).then(q=>{if(q.state==='granted')$('#zLoc').click()}).catch(()=>{});
+  }
+  zDraw(false)}
+function zDraw(fit){
+  Object.entries(zLayers).forEach(([id,x])=>x.poly.setStyle({weight:id===R.id?4:2,fillOpacity:id===R.id?.3:.14}));
+  if(zmap&&zPos){if(!zMe)zMe=L.circleMarker([zPos.lat,zPos.lng],{radius:7,color:'#fff',weight:3,fillColor:'#2D7FF9',fillOpacity:1}).addTo(zmap);else zMe.setLatLng([zPos.lat,zPos.lng]);
+    if(fit){const b=L.featureGroup(Object.values(zLayers).map(x=>x.poly)).getBounds();const d=Math.min(...ROUTES.map(zDist));if(d<15000)b.extend([zPos.lat,zPos.lng]);zmap.fitBounds(b,{padding:[18,18]})}}
+  const rows=ROUTES.map((r,i)=>({r,i,d:zDist(r)}));if(zPos)rows.sort((a,b)=>a.d-b.d);
+  const inside=zPos&&rows[0].d<400?rows[0].r:null;
+  $('#zList').innerHTML=(inside?`<p class="zhere">${ico('pin')} Estás en <b>${esc(inside.name)}</b></p>`:'')+rows.map(({r,i,d})=>{const n=r.main.filter(s=>done.has(s.id)).length;
+    return `<button class="zrow${r===R?' on':''}" data-z="${r.id}"><i style="background:${ZCOL[i%ZCOL.length]}"></i><span><b>${esc(r.name)}</b><small>${r.main.length} paradas · ${n}/${r.main.length} hechas${r.km?' · '+esc(r.km):''}</small></span><em>${d==null?'':zFmt(d)}</em></button>`}).join('');
+  $$('#zList [data-z]').forEach(b=>b.onclick=()=>setRoute(b.dataset.z,true))}
 function renderRouteChips(){
   $('#routeChips').innerHTML=ROUTES.map(r=>{const n=r.main.filter(s=>done.has(s.id)).length;const full=r.main.length&&n===r.main.length;return `<button class="rchip${full?' done':''}" data-route="${r.id}" aria-pressed="${r===R}"${full?` aria-label="${esc(r.short)}, completada"`:''}>${ico(r.icon)}<span><b>${esc(r.short)}</b><small>${full?ico('check')+' ':''}${n}/${r.main.length}</small></span></button>`}).join('');
   $$('[data-route]').forEach(b=>b.onclick=()=>setRoute(b.dataset.route));
+  try{renderZoneMap()}catch(e){console.error(e)}
 }
 function setRoute(id,keepScroll){R=routeById[id];store.set('strollo-route-'+CI.id,id);if(map&&foodOn)setTimeout(()=>drawFood(),0);if(audio.paused&&byId[cur].isIntro)cur=R.intro.id;renderRoute();if(map)drawRoute(true);if(!keepScroll)window.scrollTo(0,0)}
 function todayISO(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
