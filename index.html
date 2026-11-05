@@ -1117,7 +1117,7 @@ button.go{border:0;background:transparent;cursor:pointer;padding:2px 0;font:inhe
 .city b{display:block;font-family:var(--f-display);font-weight:400;font-size:1.3rem}
 .city small{font-size:.8rem;color:var(--muted)}
 .city .go-ic{width:20px;height:20px;color:var(--muted)}
-.city.cur{background:var(--ok-soft)}
+.city.cur{background:color-mix(in srgb,var(--sea-2) 14%,transparent)}.curtag{font-style:normal;font-weight:600;color:var(--cay)}
 .soon{border:2px dashed var(--line);border-radius:22px;padding:18px;color:var(--muted);text-align:center;font-size:.9rem}
 
 /* Info */
@@ -2121,7 +2121,7 @@ function renderHome(){
   const cur=started||st.get('strollo-dest',null);
   $('#countries').innerHTML=COUNTRIES.map(c=>{const nr=c.cities.reduce((a,x)=>a+x.routes,0),ns=c.cities.reduce((a,x)=>a+x.stops,0);
     return `<article class="country"><div class="c-cover">${c.photo?`<img src="${fp(c.photo,900)}" alt="" onerror="this.remove()">`:''}<div class="ct"><h2>${esc(c.name)}</h2><span>${c.cities.length} ${c.cities.length===1?'ciudad':'ciudades'} · ${nr} rutas · ${ns} paradas</span></div></div>
-    <p class="c-desc">${esc(c.desc||'')}</p><div class="cities">${c.cities.map(x=>`<button class="city${cur&&cur.c===c.id&&cur.city===x.id?' cur':''}" data-c="${c.id}" data-city="${x.id}"><span class="th">${x.photo?`<img src="${fp(x.photo,200)}" alt="" onerror="this.remove()">`:''}</span><span><b>${esc(x.name)}</b><small>${x.routes} rutas · ${x.stops} paradas</small></span><svg class="ico go-ic"><use href="#i-chev"/></svg></button>`).join('')}</div></article>`}).join('')+
+    <p class="c-desc">${esc(c.desc||'')}</p><div class="cities">${c.cities.map(x=>`<button class="city${cur&&cur.c===c.id&&cur.city===x.id?' cur':''}" data-c="${c.id}" data-city="${x.id}"><span class="th">${x.photo?`<img src="${fp(x.photo,200)}" alt="" onerror="this.remove()">`:''}</span><span><b>${esc(x.name)}</b><small>${cur&&cur.c===c.id&&cur.city===x.id?'<em class="curtag">Última visitada</em> · ':''}${x.routes} rutas · ${x.stops} paradas</small></span><svg class="ico go-ic"><use href="#i-chev"/></svg></button>`).join('')}</div></article>`}).join('')+
     `<div class="soon">Más países muy pronto.</div>`;
   document.querySelectorAll('[data-city]').forEach(b=>b.onclick=()=>choose(b.dataset.c,b.dataset.city));
 }
