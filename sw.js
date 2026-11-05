@@ -1,6 +1,6 @@
 // Service worker: la app y los audios funcionan sin conexión una vez descargados.
 const CACHE = 'kdk-v3';
-const VERSION = '2026-11-05l';
+const VERSION = '2026-11-05m';
 
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
@@ -30,10 +30,11 @@ self.addEventListener('fetch', e => {
     return;
   }
 
+  if (url.pathname.endsWith('/api.php')) return; // búsquedas de fotos: siempre a la red
   if (url.pathname.includes('/audio/') || url.hostname === 'cdnjs.cloudflare.com' || url.hostname.endsWith('gstatic.com') || url.hostname === 'fonts.googleapis.com' || url.hostname === 'upload.wikimedia.org' || url.hostname === 'commons.wikimedia.org') {
     // Caché primero para audios, librerías y fuentes.
     e.respondWith(
-      caches.match(req, { ignoreSearch: true }).then(hit => hit || fetch(req).then(r => {
+      caches.match(req, { ignoreSearch: url.pathname.includes('/audio/') }).then(hit => hit || fetch(req).then(r => {
         if (r.ok || r.type === 'opaque') { const copy = r.clone(); caches.open(CACHE).then(c => c.put(req, copy)); }
         return r;
       }))
