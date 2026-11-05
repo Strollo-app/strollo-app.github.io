@@ -1388,7 +1388,7 @@ button.go{border:0;background:transparent;cursor:pointer;padding:2px 0;font:inhe
   <p>Rutas a pie con audioguía, mapa, navegación y dónde comer. Elige país y ciudad.</p>
  </div><div class="stripe"></div></div>
  <div class="pad"><div class="inner stack" id="countries" style="padding-block:20px 16px"><p class="empty">Cargando destinos…</p></div></div>
- <div class="pad"><div class="inner" style="padding-bottom:40px"><form class="card block suggest" id="suggestForm" novalidate>
+ <div class="pad" hidden><div class="inner" style="padding-bottom:40px"><form class="card block suggest" id="suggestForm" novalidate>
   <h2>¿Qué ciudad quieres en Strollo?</h2><p class="fnote">Dinos adónde viajas y la añadiremos. Ya estamos preparando Madrid, Barcelona, Sevilla, Granada, Córdoba, Valencia, Toledo, Málaga, Salamanca, Segovia, San Sebastián y Santiago.</p>
   <label for="sgCity">Ciudad</label><input id="sgCity" maxlength="60" placeholder="Ej.: Roma, Praga, Cádiz" autocomplete="off">
   <label for="sgWhen">¿Cuándo viajas? (opcional)</label><input id="sgWhen" maxlength="40" placeholder="Ej.: marzo de 2027" autocomplete="off">
@@ -2261,7 +2261,7 @@ let COUNTRIES=[],started=null;
 async function getJSON(u){const r=await fetch(u,{cache:'no-cache'});if(!r.ok)throw new Error(u);return r.json()}
 (function(){const f=document.getElementById('suggestForm');if(!f)return;f.onsubmit=e=>{e.preventDefault();const c=document.getElementById('sgCity').value.trim(),w=document.getElementById('sgWhen').value.trim(),m=document.getElementById('sgMsg').value.trim(),n=document.getElementById('sgNote');
   if(!c){n.textContent='Escribe al menos el nombre de la ciudad.';document.getElementById('sgCity').focus();return}
-  const to=['cdebalompedica','gmail.com'].join('@');const body=`Ciudad: ${c}\nCuándo: ${w||'-'}\nComentario: ${m||'-'}\n\n(Enviado desde Strollo)`;
+  const to='';const body=`Ciudad: ${c}\nCuándo: ${w||'-'}\nComentario: ${m||'-'}\n\n(Enviado desde Strollo)`;
   location.href=`mailto:${to}?subject=${encodeURIComponent('Strollo · Sugerencia de ciudad: '+c)}&body=${encodeURIComponent(body)}`;n.textContent='¡Gracias! Si no se abre tu correo, escríbenos con el nombre de la ciudad.'}})();
 function renderHome(){
   const cur=started||st.get('strollo-dest',null);
