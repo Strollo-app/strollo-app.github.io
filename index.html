@@ -1367,7 +1367,7 @@ button.go{border:0;background:transparent;cursor:pointer;padding:2px 0;font:inhe
 <div class="m3d" id="m3d" hidden role="dialog" aria-modal="true" aria-labelledby="m3dTitle">
  <div class="m3d-top"><b id="m3dTitle">Modelo 3D</b><button class="m3d-x" id="m3dClose" aria-label="Cerrar el modelo 3D">✕</button></div>
  <div class="m3d-stage" id="m3dStage"><canvas id="m3dCanvas" aria-label="Modelo 3D. Arrastra para girar y pellizca para acercar."></canvas><div id="m3dPins"></div><div class="m3d-name" id="m3dName" hidden></div></div>
- <div class="m3d-bar"><button class="chip" id="m3dInside" aria-pressed="false">Ver por dentro</button><button class="chip" id="m3dReset">Vista inicial</button><span>Arrastra para girar · pellizca para acercar</span></div>
+ <div class="m3d-bar"><button class="chip" id="m3dInside" aria-pressed="false">Ver por dentro</button><button class="chip" id="m3dReset">Vista inicial</button><a class="chip" id="m3dEarth" href="#" target="_blank" rel="noopener" hidden>Ver en Google Earth</a><span>Arrastra para girar · pellizca para acercar</span></div>
 </div>
 
 <div class="dock pad" role="region" aria-label="Reproductor">
@@ -1702,9 +1702,9 @@ function close3D(){$('#m3d').hidden=true;if(m3){cancelAnimationFrame(m3.raf);win
 $('#m3dClose').onclick=close3D;
 function init3D(s,name){const T=window.THREE;if(m3)close3D(),$('#m3d').hidden=false;
   const st=$('#m3dStage'),cv=$('#m3dCanvas');let r;try{r=new T.WebGLRenderer({canvas:cv,antialias:true})}catch(e){$('#m3dPins').innerHTML='<p class="m3d-err">Tu móvil no puede mostrar 3D.</p>';return}
-  r.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
-  const sc=new T.Scene();sc.background=new T.Color(0xDDE7EC);sc.fog=new T.Fog(0xDDE7EC,300,620);
-  sc.add(new T.HemisphereLight(0xffffff,0x8a957a,0.62));const dl=new T.DirectionalLight(0xfff4e0,0.95);dl.position.set(-90,150,110);sc.add(dl);
+  r.setPixelRatio(Math.min(window.devicePixelRatio||1,2));r.shadowMap.enabled=true;r.shadowMap.type=T.PCFSoftShadowMap;
+  const sc=new T.Scene();sc.background=new T.Color(0xCFE0EC);sc.fog=new T.Fog(0xCFE0EC,320,700);
+  sc.add(new T.HemisphereLight(0xe4eef7,0x6f7c5e,0.55));const dl=new T.DirectionalLight(0xfff0d8,0.85);dl.position.set(-110,170,120);dl.castShadow=true;dl.shadow.mapSize.set(2048,2048);const sd=160;Object.assign(dl.shadow.camera,{left:-sd,right:sd,top:sd,bottom:-sd,near:10,far:600});dl.shadow.bias=-0.0006;dl.shadow.normalBias=0.4;sc.add(dl);
   const cam=new T.PerspectiveCamera(42,1,1,2500);const m=window.STROLLO3D[name](T,sc);
   const tgt=new T.Vector3(...m.target);const fitR=()=>m.radius*(st.clientWidth<st.clientHeight?1.35:1);let az=m.azimuth,el=m.elevation,rad=fitR(),auto=true;
   const place=()=>{cam.position.set(tgt.x+rad*Math.cos(el)*Math.sin(az),tgt.y+rad*Math.sin(el),tgt.z+rad*Math.cos(el)*Math.cos(az));cam.lookAt(tgt)};
@@ -1720,6 +1720,7 @@ function init3D(s,name){const T=window.THREE;if(m3)close3D(),$('#m3d').hidden=fa
     else if(pts.size===2){const [a,b]=[...pts.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pd)rad=Math.min(420,Math.max(45,rad*pd/d));pd=d}};
   cv.onpointerup=cv.onpointercancel=e=>{pts.delete(e.pointerId);pd=0};
   cv.onwheel=e=>{e.preventDefault();auto=false;rad=Math.min(420,Math.max(45,rad*(1+e.deltaY*0.001)))};
+  const ea=$('#m3dEarth');if(m.earth){ea.href=m.earth;ea.hidden=false}else ea.hidden=true;
   const insideB=$('#m3dInside');let inside=false;const setIn=v=>{inside=v;m.shell.forEach(o=>o.visible=!v);insideB.setAttribute('aria-pressed',v?'true':'false');insideB.classList.toggle('primary',v)};setIn(false);
   insideB.onclick=()=>{setIn(!inside);if(inside){el=Math.max(el,0.95);rad=Math.min(fitR(),210)}};
   $('#m3dReset').onclick=()=>{az=m.azimuth;el=m.elevation;rad=fitR();setIn(false);nm.hidden=true;pins.forEach(x=>x.b.classList.remove('on'))};
