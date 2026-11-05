@@ -884,6 +884,8 @@ main{padding-bottom:calc(var(--tabs) + var(--dock) + env(safe-area-inset-bottom,
 .diary textarea{width:100%;box-sizing:border-box;font:inherit;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--surface);color:var(--ink);resize:vertical}
 .dphotos{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.dphotos figure{margin:0;position:relative}.dphotos img{width:76px;height:76px;object-fit:cover;border-radius:10px;display:block}.dphotos button{position:absolute;top:-6px;right:-6px;width:24px;height:24px;border-radius:12px;border:0;background:#12202A;color:#fff;font-size:12px;cursor:pointer}
 .dadd{display:inline-flex;align-items:center;gap:6px;cursor:pointer}.dentry{border-top:1px solid var(--line);padding:10px 0}.dentry b{display:block}.dentry p{margin:4px 0 0;white-space:pre-wrap;font-size:14px;line-height:1.45}
+.suggest{display:flex;flex-direction:column;gap:6px}.suggest h2{margin:0;font-family:var(--display,serif);font-weight:400;font-size:24px}.suggest label{font-size:13px;color:var(--muted);margin-top:6px}
+.suggest input,.suggest textarea{font:inherit;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);min-height:44px;box-sizing:border-box;width:100%}.suggest button{align-self:flex-start;margin-top:8px}
 .parts h3{margin-bottom:2px}
 .plan{margin:4px 0 14px;border:1px solid var(--line);border-radius:16px;background:var(--raise);overflow:hidden}
 .plan svg{display:block;width:100%;height:auto;touch-action:manipulation}
@@ -1385,7 +1387,14 @@ button.go{border:0;background:transparent;cursor:pointer;padding:2px 0;font:inhe
   <h1>¿Dónde paseamos?</h1>
   <p>Rutas a pie con audioguía, mapa, navegación y dónde comer. Elige país y ciudad.</p>
  </div><div class="stripe"></div></div>
- <div class="pad"><div class="inner stack" id="countries" style="padding-block:20px 40px"><p class="empty">Cargando destinos…</p></div></div>
+ <div class="pad"><div class="inner stack" id="countries" style="padding-block:20px 16px"><p class="empty">Cargando destinos…</p></div></div>
+ <div class="pad"><div class="inner" style="padding-bottom:40px"><form class="card block suggest" id="suggestForm" novalidate>
+  <h2>¿Qué ciudad quieres en Strollo?</h2><p class="fnote">Dinos adónde viajas y la añadiremos. Ya estamos preparando Madrid, Barcelona, Sevilla, Granada, Córdoba, Valencia, Toledo, Málaga, Salamanca, Segovia, San Sebastián y Santiago.</p>
+  <label for="sgCity">Ciudad</label><input id="sgCity" maxlength="60" placeholder="Ej.: Roma, Praga, Cádiz" autocomplete="off">
+  <label for="sgWhen">¿Cuándo viajas? (opcional)</label><input id="sgWhen" maxlength="40" placeholder="Ej.: marzo de 2027" autocomplete="off">
+  <label for="sgMsg">Comentario (opcional)</label><textarea id="sgMsg" rows="2" maxlength="300" placeholder="Qué te gustaría que tuviera"></textarea>
+  <button class="chip primary" type="submit">Enviar sugerencia</button><p class="fnote" id="sgNote" role="status">Se abrirá tu correo con el mensaje listo para enviar.</p>
+ </form></div></div>
 </div>
 <div class="toast" id="toast" hidden role="status"></div>
 <!-- STOP SHEET -->
@@ -2250,6 +2259,10 @@ const st={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.par
 const fp=(f,w)=>f?`https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(f.replace(/ /g,'_'))}?width=${w}`:'';
 let COUNTRIES=[],started=null;
 async function getJSON(u){const r=await fetch(u,{cache:'no-cache'});if(!r.ok)throw new Error(u);return r.json()}
+(function(){const f=document.getElementById('suggestForm');if(!f)return;f.onsubmit=e=>{e.preventDefault();const c=document.getElementById('sgCity').value.trim(),w=document.getElementById('sgWhen').value.trim(),m=document.getElementById('sgMsg').value.trim(),n=document.getElementById('sgNote');
+  if(!c){n.textContent='Escribe al menos el nombre de la ciudad.';document.getElementById('sgCity').focus();return}
+  const to=['cdebalompedica','gmail.com'].join('@');const body=`Ciudad: ${c}\nCuándo: ${w||'-'}\nComentario: ${m||'-'}\n\n(Enviado desde Strollo)`;
+  location.href=`mailto:${to}?subject=${encodeURIComponent('Strollo · Sugerencia de ciudad: '+c)}&body=${encodeURIComponent(body)}`;n.textContent='¡Gracias! Si no se abre tu correo, escríbenos con el nombre de la ciudad.'}})();
 function renderHome(){
   const cur=started||st.get('strollo-dest',null);
   $('#countries').innerHTML=COUNTRIES.map(c=>{const nr=c.cities.reduce((a,x)=>a+x.routes,0),ns=c.cities.reduce((a,x)=>a+x.stops,0);
