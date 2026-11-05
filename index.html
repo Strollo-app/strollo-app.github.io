@@ -1026,6 +1026,10 @@ details.script p{margin:.8em 0 0;max-width:65ch;color:var(--ink)}
 .destpin .ico{width:34px;height:34px;fill:#D93025;stroke:#fff;stroke-width:1.5}
 body.navigating .mapnote,body.navigating .mapfab{display:none}
 .mapfab{top:auto;bottom:60px}
+.compass{position:absolute;right:max(12px,env(safe-area-inset-right,0px));bottom:216px;z-index:640;border-radius:22px}
+.compass.on{background:#1A73E8;color:#fff;border-color:#1A73E8}
+body.navigating .compass{bottom:150px}
+.maptoast{position:absolute;left:16px;right:16px;bottom:270px;z-index:700;background:rgba(18,32,42,.92);color:#fff;padding:10px 14px;border-radius:12px;font-size:14px;line-height:1.35;text-align:center}
 
 /* food on map */
 .fpin{width:26px;height:26px;border-radius:50%;background:#B5621A;border:2px solid #fff;display:grid;place-items:center;color:#fff;box-shadow:0 2px 5px rgba(0,0,0,.3)}
@@ -1221,6 +1225,8 @@ button.go{border:0;background:transparent;cursor:pointer;padding:2px 0;font:inhe
    <div class="mapnote" id="mapNote">Toca un número para ver la parada</div>
    <div class="navpanel" id="navPanel" hidden role="status"></div>
    <div class="navbottom" id="navBottom" hidden></div>
+   <button class="fab compass" id="compassBtn" aria-label="Orientar el mapa como la realidad" aria-pressed="false"><svg aria-hidden="true" width="26" height="26" viewBox="0 0 26 26"><g id="compassNeedle" style="transform-origin:13px 13px;transition:transform .15s"><path d="M13 2 L17.5 13 H8.5 Z" fill="#D93025"></path><path d="M13 24 L8.5 13 H17.5 Z" fill="currentColor" opacity=".45"></path></g></svg></button>
+   <div class="maptoast" id="mapToast" hidden role="status"></div>
    <button class="recenter" id="recenter" hidden><svg class="ico"><use href="#i-locate"/></svg>Centrar</button>
   </div>
  </section>
@@ -1339,6 +1345,7 @@ button.go{border:0;background:transparent;cursor:pointer;padding:2px 0;font:inhe
 <audio id="audio" preload="none"></audio>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="./vendor/leaflet-rotate.js"></script>
 <script>
 function startApp(CO,CI){
 if(CI.override){CO=Object.assign({},CO,CI.override);if(CI.override.say)CO.say=Object.assign({},CO.say||{},CI.override.say)}if(CI.helpExtra)CO.help=[...(CO.help||[]),...CI.helpExtra];if(CI.practicalExtra)CO.practical=[...(CO.practical||[]),...CI.practicalExtra];
@@ -1571,14 +1578,14 @@ function drawRoute(fit){
 function initMap(){
   if(mapReady){map&&map.invalidateSize();return}mapReady=true;
   if(typeof L==='undefined'){schematic();return}
-  map=L.map('map',{zoomControl:false,attributionControl:true}).setView([41.01,28.98],14);
+  map=L.map('map',{zoomControl:false,attributionControl:true,rotate:true,touchRotate:true,rotateControl:false,shiftKeyRotate:false,bearing:0}).setView([41.01,28.98],14);
   let ok=0,bad=0,fell=false,alt=false;
   let tl=L.tileLayer('https://{s}.basemap.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',attribution:'© OpenStreetMap · © CARTO'}).addTo(map);
   const watch=t=>{t.on('tileload',()=>ok++);t.on('tileerror',()=>{bad++;
     if(!ok&&bad>=4&&!alt){alt=true;bad=0;map.removeLayer(tl);tl=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);watch(tl)}
     else if(!ok&&bad>=4&&alt&&!fell){fell=true;$('#map').style.display='none';schematic()}})};
   watch(tl);drawRoute(true);if(nav&&nav.route)drawNav(nav.i,nav.last);
-  map.on('dragstart',()=>{if(nav){nav.follow=false;$('#recenter').hidden=false}});if(foodOn)drawFood();
+  map.on('dragstart',()=>{if(nav){nav.follow=false;$('#recenter').hidden=false}});map.on('rotate',()=>{setNeedle();updArrow()});setNeedle();if(foodOn)drawFood();
 }
 $('#foodBtn').onclick=()=>{foodOn=!foodOn;store.set('kdk-foodmap',foodOn);drawFood();if(!foodOn)$('#mapNote').textContent='Toca un número para ver la parada'};
 $('#fitBtn').onclick=()=>map&&map.fitBounds(L.latLngBounds(R.stops.map(s=>[s.lat,s.lng])),{padding:[30,30]});
@@ -1592,6 +1599,29 @@ $('#meBtn').onclick=()=>{
 };
 
 
+/* ---------- ROTACIÓN Y BRÚJULA ---------- */
+let compassOn=false,cmpH=null,cmpT=0,cmpEv=null,toastT=0,cmpPerm=null;
+const needPerm=()=>typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function';
+function compassAsk(){if(!needPerm()||cmpPerm)return Promise.resolve(cmpPerm||'granted');return DeviceOrientationEvent.requestPermission().then(r=>{cmpPerm=r;return r}).catch(()=>{cmpPerm='denied';return 'denied'})}
+const canRotate=()=>map&&typeof map.setBearing==='function';
+function mapToast(m){const t=$('#mapToast');t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,3500)}
+function setNeedle(){const b=canRotate()?map.getBearing():0;const n=document.getElementById('compassNeedle');if(n)n.style.transform='rotate('+b+'deg)';const c=$('#compassBtn');c.classList.toggle('on',compassOn);c.setAttribute('aria-pressed',compassOn?'true':'false')}
+function arrowDeg(){const h=compassOn&&cmpH!=null?cmpH:(nav&&nav.heading);return Math.round((h||0)+(canRotate()?map.getBearing():0))}
+function updArrow(){const a=document.querySelector('.me-arrow');if(a&&nav&&(nav.heading!=null||compassOn))a.style.transform='rotate('+arrowDeg()+'deg)'}
+function onOri(e){let h=null;if(e.webkitCompassHeading!=null)h=e.webkitCompassHeading;else if(e.absolute&&e.alpha!=null)h=360-e.alpha;if(h==null||isNaN(h))return;
+  const so=(screen.orientation&&screen.orientation.angle)||window.orientation||0;h=(h+so+360)%360;
+  if(cmpH==null)cmpH=h;else{const d=((h-cmpH+540)%360)-180;if(Math.abs(d)<1.5)return;cmpH=(cmpH+d*0.3+360)%360}
+  const now=Date.now();if(now-cmpT<70)return;cmpT=now;if(compassOn&&canRotate())map.setBearing(-cmpH)}
+function compassStart(quiet){if(!canRotate()||compassOn)return;
+  const go=()=>{compassOn=true;cmpH=null;cmpEv='ondeviceorientationabsolute' in window?'deviceorientationabsolute':'deviceorientation';window.addEventListener(cmpEv,onOri);setNeedle();
+    if(!quiet)mapToast('El mapa gira con el móvil. Toca la brújula para volver al norte.');
+    setTimeout(()=>{if(compassOn&&cmpH==null){compassStop(false);if(!quiet)mapToast('Este móvil no da la brújula. Puedes girar el mapa con dos dedos.')}},3000)};
+  if(!needPerm()||cmpPerm==='granted'){go();return}
+  if(quiet&&cmpPerm==null&&/iP(hone|ad|od)|Macintosh/.test(navigator.userAgent))return;
+  compassAsk().then(r=>{if(r==='granted'||!/iP(hone|ad|od)|Macintosh/.test(navigator.userAgent))go();else if(!quiet)mapToast('Sin permiso de brújula. Puedes girar el mapa con dos dedos.')})}
+function compassStop(reset){if(cmpEv)window.removeEventListener(cmpEv,onOri);compassOn=false;cmpH=null;if(reset&&canRotate())map.setBearing(0);setNeedle();updArrow()}
+$('#compassBtn').onclick=()=>{if(!canRotate()){mapToast('Abre el mapa para poder girarlo');return}
+  if(compassOn)compassStop(true);else if(Math.abs(map.getBearing())>1)map.setBearing(0);else compassStart(false)};
 $('#recenter').onclick=()=>{if(nav){nav.follow=true;$('#recenter').hidden=true;if(nav.last)map.setView(nav.last,18)}};
 /* ---------- PHOTOS (Wikimedia Commons) ---------- */
 const PH=CI.photoCands||{};
@@ -1671,10 +1701,10 @@ async function routeOSRM(a,b){
 function startNav(id){
   const s=typeof id==='string'?byId[id]:id;if(!s)return;
   if(!navigator.geolocation){alertNav('Este navegador no comparte la ubicación. Usa Google Maps.');return}
-  stopNav(true);nav={t:s,route:null,steps:[],last:null,prev:null,fetching:false,follow:true,i:0,spoken:{},off:0,lastRoute:0,heading:null,voice:store.get('kdk-voice',true)};
+  stopNav(true);compassAsk().then(()=>{if(nav&&canRotate())compassStart(true)});nav={t:s,route:null,steps:[],last:null,prev:null,fetching:false,follow:true,i:0,spoken:{},off:0,lastRoute:0,heading:null,voice:store.get('kdk-voice',true)};
   try{if(nav.voice&&window.speechSynthesis){const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u)}}catch(e){}
   location.hash='mapa';
-  setTimeout(()=>{initMap();document.body.classList.add('navigating');showNavPanel('Buscando tu ubicación…',null);
+  setTimeout(()=>{initMap();document.body.classList.add('navigating');try{compassStart(true)}catch(e){}showNavPanel('Buscando tu ubicación…',null);
     nav.watch=watchPos(p=>onNavPos(p.coords.latitude,p.coords.longitude,p.coords.heading,p.coords.speed),(err,soft)=>{if(nav&&!nav.last)alertNav(geoMsg(err))});
   },80);
 }
@@ -1712,7 +1742,7 @@ function onNavPos(la,lo,hd,spd){
   if(!nav)return;const s=nav.t;
   if(nav.last&&(hd==null||isNaN(hd))){const mv=distM(nav.last[0],nav.last[1],la,lo);if(mv>4)nav.heading=bearingDeg(nav.last[0],nav.last[1],la,lo)}else if(hd!=null&&!isNaN(hd)&&(spd||0)>0.4)nav.heading=hd;
   nav.last=[la,lo];
-  if(map){const html=`<div class="me-nav">${nav.heading!=null?`<div class="me-arrow" style="transform:rotate(${Math.round(nav.heading)}deg)"></div>`:''}<div class="me-dot"></div></div>`;
+  if(map){const html=`<div class="me-nav">${nav.heading!=null?`<div class="me-arrow" style="transform:rotate(${arrowDeg()}deg)"></div>`:''}<div class="me-dot"></div></div>`;
     if(!meMarker)meMarker=L.marker([la,lo],{icon:L.divIcon({className:'',html,iconSize:[44,44],iconAnchor:[22,22]}),zIndexOffset:1000}).addTo(map);
     else{meMarker.setLatLng([la,lo]);meMarker.setIcon(L.divIcon({className:'',html,iconSize:[44,44],iconAnchor:[22,22]}))}
     if(nav.follow&&nav.started)map.setView([la,lo],Math.max(map.getZoom(),17),{animate:true})}
@@ -1758,7 +1788,7 @@ function showNavPanel(instr,info){
   $('#navVoice').onclick=()=>{nav.voice=!nav.voice;store.set('kdk-voice',nav.voice);if(!nav.voice&&window.speechSynthesis)speechSynthesis.cancel();showNavPanel(instr,info)};
   $('#recenter').hidden=nav.follow;
 }
-function stopNav(keep){if(nav){if(nav.watch)nav.watch.clear();if(nav.lines)Object.values(nav.lines).forEach(l=>l.remove())}nav=null;try{window.speechSynthesis&&speechSynthesis.cancel()}catch(e){}
+function stopNav(keep){if(compassOn)compassStop(true);if(nav){if(nav.watch)nav.watch.clear();if(nav.lines)Object.values(nav.lines).forEach(l=>l.remove())}nav=null;try{window.speechSynthesis&&speechSynthesis.cancel()}catch(e){}
   if(!keep){$('#navPanel').hidden=true;$('#navBottom').hidden=true;document.body.classList.remove('navigating')}$('#recenter').hidden=true}
 
 
@@ -1914,7 +1944,7 @@ $$('[data-copy]').forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.w
 
 /* ---------- OFFLINE ---------- */
 const canOffline='serviceWorker' in navigator && 'caches' in window && /github\.io$/.test(location.hostname);
-const ALL_FILES=['./','./index.html','./sw.js','./data/countries.json',CO.file,'./manifest.json','./icons/apple-touch-icon.png','./icons/icon-192.png',...Object.values(byId).filter(s=>!s.isMore).map(s=>s.file),...Object.values(TR),'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js'];
+const ALL_FILES=['./','./index.html','./sw.js','./data/countries.json',CO.file,'./manifest.json','./icons/apple-touch-icon.png','./icons/icon-192.png',...Object.values(byId).filter(s=>!s.isMore).map(s=>s.file),...Object.values(TR),'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js','./vendor/leaflet-rotate.js'];
 async function offlineState(){
   if(!canOffline){$('#offline').innerHTML=`<div class="art">${ico('download')}</div><div><b>Uso sin conexión</b><span>Disponible al abrir la web desde el enlace de GitHub (no desde esta vista previa).</span></div>`;return}
   let n=0;try{const c=await caches.open('kdk-v3');for(const f of ALL_FILES){if(await c.match(f))n++}}catch(e){}
