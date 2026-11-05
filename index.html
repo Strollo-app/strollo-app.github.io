@@ -1409,7 +1409,7 @@ function renderList(){
     return wl+`<li><button class="srow${done.has(s.id)?' is-done':''}" data-open="${s.id}">
       <div class="thumb">${coverBg(s)}<span class="n">${s.extra?'EXTRA':num(s)}</span>${ico(s.icon)}<span class="done">${ico('check')}</span></div>
       <div class="body"><b>${esc(s.name)}</b><span class="tr">${esc(s.tr)}</span>
-      <div class="meta"><span>${ico('headphones')}${fmt(s.dur)}${s.more?' + '+fmt(s.more.dur):''}</span>${qa!=null?`<span class="${qa?'qok':'qko'}">${ico(qa?'check':'alert')}Quiz</span>`:''}</div></div>
+      <div class="meta"><span>${ico('headphones')}${fmt(s.dur)}${s.more?' + '+fmt(s.more.dur):''}</span>${s.parts&&s.parts.length?`<span>${s.parts.length} rincones</span>`:''}${qa!=null?`<span class="${qa?'qok':'qko'}">${ico(qa?'check':'alert')}Quiz</span>`:''}</div></div>
     </button></li>`}).join('');
   $$('#list [data-open]').forEach(b=>b.onclick=()=>{location.hash='p-'+b.dataset.open});
   const n=R.main.filter(s=>done.has(s.id)).length;
