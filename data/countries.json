@@ -43,7 +43,7 @@
     "id": "albacete",
     "name": "Albacete",
     "routes": 2,
-    "stops": 12,
+    "stops": 14,
     "photo": "Catedral de Albacete.jpg",
     "desc": "Modernismo, navajas, la catedral de los cuatro siglos y la Feria con forma de sartén."
    },
@@ -138,6 +138,23 @@
     "stops": 18,
     "photo": "The Parthenon in Athens.jpg",
     "desc": "La Acrópolis y el Partenón, el ágora de Sócrates, Plaka y Monastiraki, el cambio de guardia y el estadio de mármol."
+   }
+  ]
+ },
+ {
+  "name": "Francia",
+  "photo": "Toulouse - Place du Capitole et croix occitane.jpg",
+  "desc": "Ladrillo rosa, pato confitado y el Camino de Santiago.",
+  "id": "fr",
+  "file": "data/fr.json",
+  "cities": [
+   {
+    "id": "toulouse",
+    "name": "Toulouse",
+    "routes": 2,
+    "stops": 11,
+    "photo": "Toulouse - Place du Capitole et croix occitane.jpg",
+    "desc": "La ciudad rosa: el Capitole, la basílica románica de Saint-Sernin, los Jacobinos, el Garona y el Canal du Midi."
    }
   ]
  }

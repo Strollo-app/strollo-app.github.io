@@ -2226,7 +2226,7 @@ function zoneChips(el,onPick){el.innerHTML=ZONES.map(z=>`<button aria-pressed="$
 function renderFood(){
   zone=zone||R.id;
   zoneChips($('#zfilters'),renderFood);zoneChips($('#gzfilters'),renderFood);
-  $('#rfilters').innerHTML=RCATS.map(c=>`<button aria-pressed="${c===rcat}" data-rc="${c}">${c}</button>`).join('');
+  const CATS2=[...RCATS,...new Set(PLACES.flatMap(p=>p.t||[]).filter(t=>!RCATS.includes(t)))];$('#rfilters').innerHTML=CATS2.map(c=>`<button aria-pressed="${c===rcat}" data-rc="${c}">${c}</button>`).join('');
   $$('#rfilters [data-rc]').forEach(b=>b.onclick=()=>{rcat=b.dataset.rc;renderFood()});
   const pl=PLACES.filter(p=>p.zone===zone&&(rcat==='Todo'||p.t.includes(rcat)));
   $('#places').innerHTML=pl.length?pl.map(p=>`<div class="card place"><div class="art" style="background:${grad(p.h)}">${ico(p.i)}</div><div style="min-width:0"><div class="row"><b>${esc(p.n)}</b><button class="go" data-onmap="${esc(p.q)}" data-zone="${p.zone}">${ico('map')}Ver en el mapa</button></div><div class="mono" style="font-size:.7rem;color:var(--muted)">${esc(p.z)}</div><p>${esc(p.d)}</p>${p.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}${p.gf?'<span class="tag" style="background:var(--ok-soft);color:var(--ok)">Sin gluten</span>':''}<a class="gmaps" href="${mapsQ(p.q)}" target="_blank" rel="noopener">Abrir en Google Maps ↗</a></div></div>`).join(''):`<p class="empty">No hay sitios de este tipo en esta zona. Prueba con «Todo».</p>`;
