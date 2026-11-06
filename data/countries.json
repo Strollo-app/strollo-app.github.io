@@ -380,5 +380,22 @@
     "desc": "La Grand Place, el Manneken Pis, el palacio enterrado de Carlos V, el Sablon, el Barrio Europeo y el Atomium."
    }
   ]
+ },
+ {
+  "name": "Dinamarca",
+  "photo": "Nyhavn 13-23, Copenhagen 2019.jpg",
+  "desc": "Bicicletas, diseño, Andersen, vikingos y mucho hygge.",
+  "id": "dk",
+  "file": "data/dk.json",
+  "cities": [
+   {
+    "id": "copenhague",
+    "name": "Copenhague",
+    "routes": 3,
+    "stops": 13,
+    "photo": "Nyhavn 13-23, Copenhagen 2019.jpg",
+    "desc": "Tivoli, Nyhavn, Amalienborg, la Sirenita, la Torre Redonda, Christiansborg y la ciudad libre de Christiania."
+   }
+  ]
  }
 ]
