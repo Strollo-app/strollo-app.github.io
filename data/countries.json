@@ -134,6 +134,14 @@
     "stops": 12,
     "photo": "San Sebastian Kontxa beach 1190650.jpg",
     "desc": "La Parte Vieja y sus pintxos, la plaza de la Constitución, el monte Urgull, la bahía de la Concha, el Palacio de Miramar y el Peine del Viento."
+   },
+   {
+    "id": "santiago",
+    "name": "Santiago de Compostela",
+    "routes": 3,
+    "stops": 12,
+    "photo": "Santiago cathedral 2021.jpg",
+    "desc": "El final del Camino: la plaza del Obradoiro, la Catedral con el Pórtico de la Gloria y el Botafumeiro, las rúas de piedra, el Mercado de Abastos y la Alameda."
    }
   ]
  },
