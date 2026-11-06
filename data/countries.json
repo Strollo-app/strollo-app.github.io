@@ -397,5 +397,22 @@
     "desc": "Tivoli, Nyhavn, Amalienborg, la Sirenita, la Torre Redonda, Christiansborg y la ciudad libre de Christiania."
    }
   ]
+ },
+ {
+  "name": "Suecia",
+  "photo": "Stortorget i Gamla Stan i Stockholm-2.JPG",
+  "desc": "Fika, diseño, el Vasa, ABBA y un archipiélago de 30.000 islas.",
+  "id": "se",
+  "file": "data/se.json",
+  "cities": [
+   {
+    "id": "estocolmo",
+    "name": "Estocolmo",
+    "routes": 3,
+    "stops": 13,
+    "photo": "Stortorget i Gamla Stan i Stockholm-2.JPG",
+    "desc": "Gamla stan, el Palacio Real, el barco Vasa, ABBA, Skansen, el Ayuntamiento del Nobel y el mirador de Monteliusvägen."
+   }
+  ]
  }
 ]
