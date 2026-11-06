@@ -1920,7 +1920,7 @@ function pcDraw(){const cv=$('#pcCv');if(!cv)return;const c=cv.getContext('2d'),
 /* ---------- TARJETA DE FOTO CON SELLO DEL SITIO ---------- */
 function skOpen(sid,blob){const s=byId[sid];if(!s)return;let el=$('#pcSheet');if(!el){el=document.createElement('div');el.id='pcSheet';el.className='pcsheet';document.body.appendChild(el)}
   el.innerHTML=`<div class="pcbox" role="dialog" aria-label="Tarjeta para compartir"><div class="pctop"><b>${esc(s.name)}</b><button class="iconbtn" id="pcClose" aria-label="Cerrar">${ico('close')}</button></div>
-  <canvas id="skCv" width="1080" height="1350"></canvas>
+  <canvas id="skCv" width="1080" height="1920"></canvas>
   <div class="chips pcact"><button class="chip primary" id="skShare">${ico('share')}Compartir</button><button class="chip" id="skDl">Descargar</button></div>
   <p class="fnote">Se crea aquí mismo en tu móvil. Al compartir, elige Instagram o WhatsApp.</p></div>`;
   el.hidden=false;document.body.style.overflow='hidden';
@@ -1931,7 +1931,7 @@ function skOpen(sid,blob){const s=byId[sid];if(!s)return;let el=$('#pcSheet');if
   $('#skDl').onclick=async()=>{const b=await out();const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=fname;document.body.appendChild(a);a.click();a.remove()};
   $('#skShare').onclick=async()=>{const b=await out();const f=new File([b],fname,{type:'image/png'});
     if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:s.name+' · Strollo',text:`${s.name}, ${CI.name} con @strollo.tours · strollo-app.github.io`})}catch(e){}}else $('#skDl').click()}}
-function skDraw(cv,s,img){if(!cv)return;const c=cv.getContext('2d'),W=1080,H=1350;
+function skDraw(cv,s,img){if(!cv)return;const c=cv.getContext('2d'),W=1080,H=1920;
   const D='Gloock, Georgia, serif',B='Commissioner, system-ui, sans-serif',M='"JetBrains Mono", monospace';
   const dateS=new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase().replace('.','');
   c.fillStyle='#1F4555';c.fillRect(0,0,W,H);
@@ -1940,14 +1940,15 @@ function skDraw(cv,s,img){if(!cv)return;const c=cv.getContext('2d'),W=1080,H=135
   c.fillStyle='#1F4555';c.fillRect(0,0,W-80,140);
   c.textAlign='left';c.fillStyle='#F2B827';c.font=`600 26px ${M}`;c.fillText('RUTAS A PIE · AUDIOGUÍA',48,58);c.fillStyle='#EAF3F6';c.font=`58px ${D}`;c.fillText('Strollo',48,116);
   c.textAlign='right';c.fillStyle='#B9D3DC';c.font=`600 24px ${M}`;c.fillText((CO?CO.name:'').toUpperCase(),W-128,58);c.fillStyle='#EAF3F6';c.font=`50px ${D}`;c.fillText(CI.name,W-128,116);c.textAlign='left';
-  const px=48,py=180,pw=W-80-96,ph=730;c.save();c.translate(0,0);rr(c,px,py,pw,ph,26);c.fillStyle='#D9CFBC';c.fill();c.clip();
+  const px=48,py=180,pw=W-80-96,ph=1300;c.save();c.translate(0,0);rr(c,px,py,pw,ph,26);c.fillStyle='#D9CFBC';c.fill();c.clip();
   if(img){const r=Math.max(pw/img.naturalWidth,ph/img.naturalHeight),w=img.naturalWidth*r,h=img.naturalHeight*r;c.drawImage(img,px+(pw-w)/2,py+(ph-h)/2,w,h)}
   c.restore();c.strokeStyle='#1F4555';c.lineWidth=5;rr(c,px,py,pw,ph,26);c.stroke();
   c.fillStyle='#7C6F5A';c.font=`600 24px ${M}`;c.fillText(dateS,px,py+ph+62);
   c.fillStyle='#12202A';c.font=`60px ${D}`;fitText(c,s.name,px,py+ph+130,pw-250);
   c.fillStyle='#7C6F5A';c.font=`500 30px ${B}`;c.fillText(`${CI.name}${CO?' · '+CO.name:''}`,px,py+ph+182);
   const seed=[...s.id].reduce((a,ch)=>a*31+ch.charCodeAt(0)>>>0,7),ink=['#B8322A','#1F5F8B','#2E7D4F','#7A3E9D','#C2621B'];
-  stampDraw(c,W-80-48-125,py+ph-10,140,CI.name.toUpperCase(),s.name,dateS,ink[seed%ink.length],((seed%20)-10)*Math.PI/180,D,M,140/112);
+  c.fillStyle='rgba(244,236,220,.9)';c.beginPath();c.arc(W-80-48-135,py+ph-20,150,0,7);c.fill();
+  stampDraw(c,W-80-48-135,py+ph-20,150,CI.name.toUpperCase(),s.name,dateS,ink[seed%ink.length],((seed%20)-10)*Math.PI/180,D,M,150/112);
   c.fillStyle='#1F4555';c.font=`600 28px ${M}`;c.textAlign='center';c.fillText('@strollo.tours · strollo-app.github.io',(W-80)/2,H-80-36);c.textAlign='left';
   c.restore()}
 function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
