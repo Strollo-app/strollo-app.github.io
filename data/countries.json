@@ -199,5 +199,56 @@
     "desc": "El Coliseo, el Foro, el Panteón, la Fontana de Trevi, la plaza Navona, Trastevere, San Pedro y la Capilla Sixtina."
    }
   ]
+ },
+ {
+  "name": "Países Bajos",
+  "photo": "Canal houses and Oude Kerk at blue hour with water reflection in Damrak Amsterdam Netherlands.jpg",
+  "desc": "Canales, bicicletas, tulipanes y los maestros del Siglo de Oro.",
+  "id": "nl",
+  "file": "data/nl.json",
+  "cities": [
+   {
+    "id": "amsterdam",
+    "name": "Ámsterdam",
+    "routes": 3,
+    "stops": 13,
+    "photo": "Canal houses and Oude Kerk at blue hour with water reflection in Damrak Amsterdam Netherlands.jpg",
+    "desc": "La plaza Dam, el Beguinaje, la casa de Ana Frank, el Jordaan, los canales del Siglo de Oro, el Rijksmuseum y Van Gogh."
+   }
+  ]
+ },
+ {
+  "name": "Chequia",
+  "photo": "Prague 07-2016 View from Petrinska Tower img2.jpg",
+  "desc": "Castillos, puentes góticos, cerveza y la Revolución de Terciopelo.",
+  "id": "cz",
+  "file": "data/cz.json",
+  "cities": [
+   {
+    "id": "praga",
+    "name": "Praga",
+    "routes": 3,
+    "stops": 14,
+    "photo": "Prague 07-2016 View from Petrinska Tower img2.jpg",
+    "desc": "El reloj astronómico, el puente de Carlos, el barrio judío del Golem, el Castillo, el Niño Jesús de Praga y la plaza de Wenceslao."
+   }
+  ]
+ },
+ {
+  "name": "Austria",
+  "photo": "Iglesia de San Carlos Borromeo, Viena, Austria, 2020-01-31, DD 164-166 HDR.jpg",
+  "desc": "Palacios imperiales, valses, cafés y la Viena de Klimt.",
+  "id": "at",
+  "file": "data/at.json",
+  "cities": [
+   {
+    "id": "viena",
+    "name": "Viena",
+    "routes": 3,
+    "stops": 12,
+    "photo": "Iglesia de San Carlos Borromeo, Viena, Austria, 2020-01-31, DD 164-166 HDR.jpg",
+    "desc": "La catedral de San Esteban, el Hofburg y la Escuela Española de Equitación, Klimt en el Belvedere y el palacio de Schönbrunn."
+   }
+  ]
  }
 ]
