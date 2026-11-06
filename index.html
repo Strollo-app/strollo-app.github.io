@@ -690,7 +690,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .pcbox{background:var(--bg,#fff);width:100%;max-width:520px;max-height:94vh;overflow:auto;border-radius:22px 22px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom))}
 .pctop{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.pctop b{font-size:18px}
 .pcform{display:flex;gap:8px;align-items:center;margin-bottom:12px}.pcname{flex:1;min-width:0;font:inherit;padding:10px 12px;border-radius:12px;border:1px solid var(--line,#ccd);background:var(--raise,#fff);color:inherit}
-#pcCv{width:100%;height:auto;display:block;border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,.18)}.pcact{margin:12px 0 6px}
+#pcCv,#skCv{width:100%;height:auto;display:block;border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,.18)}.pcact{margin:12px 0 6px}
 .zcard{padding:14px}.zhead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}.zhead b{display:block;font-size:15.5px;margin-top:2px}.zhead .chip{white-space:nowrap;flex:none}
 .zmapbox{height:230px;border-radius:12px;overflow:hidden;background:#E8EEF0;z-index:0}
 .zlab{background:none;border:0}.zlab span{display:inline-block;transform:translate(-50%,-50%);white-space:nowrap;color:#fff;font:600 12px/1 var(--f-body,system-ui);padding:5px 8px;border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,.25)}
@@ -900,7 +900,7 @@ main{padding-bottom:calc(var(--tabs) + var(--dock) + env(safe-area-inset-bottom,
 .pday{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}.pday h4{margin:0 0 8px;font-size:15px}.pslot{display:grid;grid-template-columns:56px 1fr;gap:8px;padding:6px 0}.pslot .t{font:600 12px var(--mono,monospace);color:var(--muted);padding-top:2px}.pslot b{display:block;font-size:14px}.pslot span{font-size:13px;color:var(--muted);line-height:1.4}.pslot a{color:inherit}
 .pwarn{font-size:12.5px;color:var(--cay);margin:4px 0 0}
 .diary textarea{width:100%;box-sizing:border-box;font:inherit;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--surface);color:var(--ink);resize:vertical}
-.dphotos{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.dphotos figure{margin:0;position:relative}.dphotos img{width:76px;height:76px;object-fit:cover;border-radius:10px;display:block}.dphotos button{position:absolute;top:-6px;right:-6px;width:24px;height:24px;border-radius:12px;border:0;background:#12202A;color:#fff;font-size:12px;cursor:pointer}
+.dphotos{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.dphotos figure{margin:0;position:relative}.dphotos img{width:76px;height:76px;object-fit:cover;border-radius:10px;display:block}.dphotos button{position:absolute;top:-6px;right:-6px;width:24px;height:24px;border-radius:12px;border:0;background:#12202A;color:#fff;font-size:12px;cursor:pointer}.dphotos button.dsh{top:auto;bottom:-6px;width:28px;height:28px;border-radius:14px;background:#F2B827;color:#12202A;display:grid;place-items:center;padding:0}.dphotos button.dsh .ico{width:15px;height:15px}
 .dadd{display:inline-flex;align-items:center;gap:6px;cursor:pointer}.dentry{border-top:1px solid var(--line);padding:10px 0}.dentry b{display:block}.dentry p{margin:4px 0 0;white-space:pre-wrap;font-size:14px;line-height:1.45}
 .suggest{display:flex;flex-direction:column;gap:6px}.suggest h2{margin:0;font-family:var(--display,serif);font-weight:400;font-size:24px}.suggest label{font-size:13px;color:var(--muted);margin-top:6px}
 .suggest input,.suggest textarea{font:inherit;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);min-height:44px;box-sizing:border-box;width:100%}.suggest button{align-self:flex-start;margin-top:8px}
@@ -1632,7 +1632,7 @@ function openSheet(id){
     ${s.q?`<div class="card block quiz" id="quizBox"><h3>Pregunta del grupo</h3><p class="qq">${esc(s.q[0])}</p><div class="qopts">${s.q[1].map((o,k)=>`<button data-ans="${k}" class="${qa!=null?(k===s.q[2]?'right':''):''}" ${qa!=null?'disabled':''}>${esc(o)}</button>`).join('')}</div><p class="qres">${qa==null?'Escuchad el audio y responded.':(qa?'¡Correcto!':'Fallaste. La buena está marcada en verde.')}</p></div>`:''}
     <div class="card block nextbox"><h3>${s.extra?'Cómo volver':(next&&!next.extra?'Hacia la parada '+num(next)+' · '+esc(next.name):'Final')}</h3><p class="gorow">${ico('walk')}<span>${esc(s.go||'')}${next&&!next.extra&&next.walk?' <b>≈ '+next.walk+' min.</b>':''}</span></p></div>
     <div class="card block diary"><h3>Mi diario</h3><textarea id="note-${s.id}" rows="3" placeholder="Apunta lo que no quieras olvidar de este sitio…" aria-label="Notas sobre ${esc(s.name)}"></textarea>
-      <div class="dphotos" id="dph-${s.id}"></div><label class="chip dadd">${ico('download')}<span>Añadir foto</span><input type="file" accept="image/*" capture="environment" id="dfile-${s.id}" hidden></label></div>
+      <div class="dphotos" id="dph-${s.id}"></div><label class="chip dadd">${ico('download')}<span>Añadir foto</span><input type="file" accept="image/*" capture="environment" id="dfile-${s.id}" hidden></label><p class="fnote">Toca el botón amarillo de una foto para crear una tarjeta Strollo con el sello de este sitio y compartirla por Instagram o WhatsApp.</p></div>
     <details class="card script"><summary>Leer el texto del audio ${ico('chev')}</summary>${s.text.split('\n\n').map(p=>'<p>'+esc(p)+'</p>').join('')}</details>
     ${s.more&&s.more.text?`<details class="card script"><summary>Leer «Más historia» ${ico('chev')}</summary>${s.more.text.split('\n\n').map(p=>'<p>'+esc(p)+'</p>').join('')}</details>`:''}
     <div class="pager">
@@ -1841,7 +1841,7 @@ const idb=(()=>{let dbp=null;const open=()=>dbp||(dbp=new Promise((ok,ko)=>{try{
 async function shrink(file){try{const bmp=await createImageBitmap(file);const sc=Math.min(1,1280/Math.max(bmp.width,bmp.height));const c=document.createElement('canvas');c.width=Math.round(bmp.width*sc);c.height=Math.round(bmp.height*sc);c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);return await new Promise(r=>c.toBlob(r,'image/jpeg',0.82))}catch(e){return file}}
 async function diaryPhotos(sid){try{return (await idb.all()).filter(o=>o.s===sid).sort((a,b)=>a.t-b.t)}catch(e){return []}}
 async function drawDiaryPhotos(sid){const box=document.getElementById('dph-'+sid);if(!box)return;const ps=await diaryPhotos(sid);box.innerHTML='';
-  ps.forEach(o=>{const f=document.createElement('figure');const im=document.createElement('img');im.src=URL.createObjectURL(o.b);im.alt='Tu foto';const x=document.createElement('button');x.textContent='✕';x.setAttribute('aria-label','Borrar foto');x.onclick=async()=>{await idb.del(o.k);drawDiaryPhotos(sid)};f.append(im,x);box.appendChild(f)})}
+  ps.forEach(o=>{const f=document.createElement('figure');const im=document.createElement('img');im.src=URL.createObjectURL(o.b);im.alt='Tu foto';const x=document.createElement('button');x.textContent='✕';x.setAttribute('aria-label','Borrar foto');x.onclick=async()=>{await idb.del(o.k);drawDiaryPhotos(sid)};const sh=document.createElement('button');sh.className='dsh';sh.innerHTML=ico('share');sh.setAttribute('aria-label','Crear tarjeta para compartir');sh.onclick=()=>skOpen(sid,o.b);f.append(im,x,sh);box.appendChild(f)})}
 function bindDiary(s){const ta=document.getElementById('note-'+s.id);if(!ta)return;ta.value=notes[s.id]||'';let tm=0;ta.oninput=()=>{clearTimeout(tm);tm=setTimeout(()=>{const v=ta.value.trim();if(v)notes[s.id]=v;else delete notes[s.id];store.set('kdk-notes',notes)},400)};
   const fi=document.getElementById('dfile-'+s.id);fi.onchange=async()=>{for(const f of fi.files){const b=await shrink(f);try{await idb.put({k:s.id+'-'+Date.now()+Math.random().toString(36).slice(2,6),s:s.id,t:Date.now(),b})}catch(e){}}fi.value='';drawDiaryPhotos(s.id)};drawDiaryPhotos(s.id)}
 /* ---------- MI VIAJE: pasaporte, plan por días, diario ---------- */
@@ -1916,6 +1916,40 @@ function pcDraw(){const cv=$('#pcCv');if(!cv)return;const c=cv.getContext('2d'),
   c.fillStyle='#12202A';c.font=`500 31px ${M}`;c.fillText(l1,56,H-240-70);c.fillText(l2,56,H-240-28);
   c.restore();
   c.fillStyle='#EAF3F6';c.font=`600 34px ${M}`;c.textAlign='center';c.fillText('@strollo.tours · strollo-app.github.io',W/2,H-62);c.textAlign='left'}
+
+/* ---------- TARJETA DE FOTO CON SELLO DEL SITIO ---------- */
+function skOpen(sid,blob){const s=byId[sid];if(!s)return;let el=$('#pcSheet');if(!el){el=document.createElement('div');el.id='pcSheet';el.className='pcsheet';document.body.appendChild(el)}
+  el.innerHTML=`<div class="pcbox" role="dialog" aria-label="Tarjeta para compartir"><div class="pctop"><b>${esc(s.name)}</b><button class="iconbtn" id="pcClose" aria-label="Cerrar">${ico('close')}</button></div>
+  <canvas id="skCv" width="1080" height="1350"></canvas>
+  <div class="chips pcact"><button class="chip primary" id="skShare">${ico('share')}Compartir</button><button class="chip" id="skDl">Descargar</button></div>
+  <p class="fnote">Se crea aquí mismo en tu móvil. Al compartir, elige Instagram o WhatsApp.</p></div>`;
+  el.hidden=false;document.body.style.overflow='hidden';
+  const close=()=>{el.hidden=true;document.body.style.overflow=''};$('#pcClose').onclick=close;el.onclick=e=>{if(e.target===el)close()};
+  const im=new Image();const draw=()=>skDraw($('#skCv'),s,im.complete&&im.naturalWidth?im:null);
+  im.onload=draw;im.src=URL.createObjectURL(blob);(document.fonts&&document.fonts.ready||Promise.resolve()).then(draw);draw();
+  const out=()=>new Promise(ok=>$('#skCv').toBlob(ok,'image/png'));const fname=`strollo-${CI.id}-${s.id}.png`;
+  $('#skDl').onclick=async()=>{const b=await out();const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=fname;document.body.appendChild(a);a.click();a.remove()};
+  $('#skShare').onclick=async()=>{const b=await out();const f=new File([b],fname,{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:s.name+' · Strollo',text:`${s.name}, ${CI.name} con @strollo.tours · strollo-app.github.io`})}catch(e){}}else $('#skDl').click()}}
+function skDraw(cv,s,img){if(!cv)return;const c=cv.getContext('2d'),W=1080,H=1350;
+  const D='Gloock, Georgia, serif',B='Commissioner, system-ui, sans-serif',M='"JetBrains Mono", monospace';
+  const dateS=new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase().replace('.','');
+  c.fillStyle='#1F4555';c.fillRect(0,0,W,H);
+  c.save();c.translate(40,40);rr(c,0,0,W-80,H-80,40);c.fillStyle='#F4ECDC';c.fill();c.clip();
+  c.strokeStyle='rgba(31,69,85,.07)';c.lineWidth=2;for(let k=0;k<60;k++){c.beginPath();for(let x=0;x<=W;x+=12){const y=k*26+Math.sin(x/70+k*.6)*12;x?c.lineTo(x,y):c.moveTo(x,y)}c.stroke()}
+  c.fillStyle='#1F4555';c.fillRect(0,0,W-80,140);
+  c.textAlign='left';c.fillStyle='#F2B827';c.font=`600 26px ${M}`;c.fillText('RUTAS A PIE · AUDIOGUÍA',48,58);c.fillStyle='#EAF3F6';c.font=`58px ${D}`;c.fillText('Strollo',48,116);
+  c.textAlign='right';c.fillStyle='#B9D3DC';c.font=`600 24px ${M}`;c.fillText((CO?CO.name:'').toUpperCase(),W-128,58);c.fillStyle='#EAF3F6';c.font=`50px ${D}`;c.fillText(CI.name,W-128,116);c.textAlign='left';
+  const px=48,py=180,pw=W-80-96,ph=730;c.save();c.translate(0,0);rr(c,px,py,pw,ph,26);c.fillStyle='#D9CFBC';c.fill();c.clip();
+  if(img){const r=Math.max(pw/img.naturalWidth,ph/img.naturalHeight),w=img.naturalWidth*r,h=img.naturalHeight*r;c.drawImage(img,px+(pw-w)/2,py+(ph-h)/2,w,h)}
+  c.restore();c.strokeStyle='#1F4555';c.lineWidth=5;rr(c,px,py,pw,ph,26);c.stroke();
+  c.fillStyle='#7C6F5A';c.font=`600 24px ${M}`;c.fillText(dateS,px,py+ph+62);
+  c.fillStyle='#12202A';c.font=`60px ${D}`;fitText(c,s.name,px,py+ph+130,pw-250);
+  c.fillStyle='#7C6F5A';c.font=`500 30px ${B}`;c.fillText(`${CI.name}${CO?' · '+CO.name:''}`,px,py+ph+182);
+  const seed=[...s.id].reduce((a,ch)=>a*31+ch.charCodeAt(0)>>>0,7),ink=['#B8322A','#1F5F8B','#2E7D4F','#7A3E9D','#C2621B'];
+  stampDraw(c,W-80-48-125,py+ph-10,140,CI.name.toUpperCase(),s.name,dateS,ink[seed%ink.length],((seed%20)-10)*Math.PI/180,D,M,140/112);
+  c.fillStyle='#1F4555';c.font=`600 28px ${M}`;c.textAlign='center';c.fillText('@strollo.tours · strollo-app.github.io',(W-80)/2,H-80-36);c.textAlign='left';
+  c.restore()}
 function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
 function fitText(c,t,x,y,mw){let f=c.font,sz=parseInt(f.match(/(\d+)px/)[1]);while(c.measureText(t).width>mw&&sz>18){sz-=2;c.font=f.replace(/\d+px/,sz+'px')}c.fillText(t,x,y)}
 function arcText(c,t,r,mid,inv){c.save();const ws=[...t].map(ch=>c.measureText(ch).width+3);const tot=ws.reduce((x,y)=>x+y,0)/r;let a=mid+(inv?tot/2:-tot/2);
