@@ -414,5 +414,22 @@
     "desc": "Gamla stan, el Palacio Real, el barco Vasa, ABBA, Skansen, el Ayuntamiento del Nobel y el mirador de Monteliusvägen."
    }
   ]
+ },
+ {
+  "name": "Polonia",
+  "photo": "Kraków - Sukiennice & Wieża Ratuszowa.jpg",
+  "desc": "Reyes, dragones, pierogi, la historia judía y una capital cultural intacta.",
+  "id": "pl",
+  "file": "data/pl.json",
+  "cities": [
+   {
+    "id": "cracovia",
+    "name": "Cracovia",
+    "routes": 3,
+    "stops": 12,
+    "photo": "Kraków - Sukiennice & Wieża Ratuszowa.jpg",
+    "desc": "La plaza del Mercado, Santa María y su retablo, Wawel, el dragón, Kazimierz y la fábrica de Schindler."
+   }
+  ]
  }
 ]
