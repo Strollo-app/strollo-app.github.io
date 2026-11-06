@@ -155,6 +155,14 @@
     "stops": 11,
     "photo": "Toulouse - Place du Capitole et croix occitane.jpg",
     "desc": "La ciudad rosa: el Capitole, la basílica románica de Saint-Sernin, los Jacobinos, el Garona y el Canal du Midi."
+   },
+   {
+    "id": "paris",
+    "name": "París",
+    "routes": 3,
+    "stops": 17,
+    "photo": "Tour Eiffel Wikimedia Commons.jpg",
+    "desc": "El Louvre, Notre-Dame renacida, la Sainte-Chapelle, el Arco de Triunfo, la Torre Eiffel y la colina de Montmartre."
    }
   ]
  },
