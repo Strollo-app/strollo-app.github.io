@@ -87,6 +87,14 @@
     "stops": 17,
     "photo": "Praça do Comércio Lisboa.jpg",
     "desc": "Alfama y el castillo, la Baixa del terremoto, el Chiado de Pessoa y los monumentos de Belém."
+   },
+   {
+    "id": "oporto",
+    "name": "Oporto",
+    "routes": 3,
+    "stops": 13,
+    "photo": "Puente Don Luis I, Oporto, Portugal, 2012-05-09, DD 13.JPG",
+    "desc": "Los azulejos de São Bento, la Ribeira, el puente Dom Luís I, la librería Lello, las bodegas del vino de Oporto y la Foz."
    }
   ]
  },
@@ -264,6 +272,40 @@
     "stops": 12,
     "photo": "Iglesia de San Carlos Borromeo, Viena, Austria, 2020-01-31, DD 164-166 HDR.jpg",
     "desc": "La catedral de San Esteban, el Hofburg y la Escuela Española de Equitación, Klimt en el Belvedere y el palacio de Schönbrunn."
+   }
+  ]
+ },
+ {
+  "name": "Irlanda",
+  "photo": "2008-05-23 The Temple Bar, Dublin, Ireland.jpg",
+  "desc": "Pubs, escritores, la Guinness y la historia de la isla esmeralda.",
+  "id": "ie",
+  "file": "data/ie.json",
+  "cities": [
+   {
+    "id": "dublin",
+    "name": "Dublín",
+    "routes": 3,
+    "stops": 13,
+    "photo": "2008-05-23 The Temple Bar, Dublin, Ireland.jpg",
+    "desc": "El Libro de Kells, Temple Bar, el Castillo, las puertas georgianas, Oscar Wilde, la Rebelión de 1916 y la Guinness."
+   }
+  ]
+ },
+ {
+  "name": "Bélgica",
+  "photo": "Grand-Place, Brussels - panorama, June 2018 (cropped).jpg",
+  "desc": "Chocolate, cerveza, cómic, Carlos V y la capital de Europa.",
+  "id": "be",
+  "file": "data/be.json",
+  "cities": [
+   {
+    "id": "bruselas",
+    "name": "Bruselas",
+    "routes": 3,
+    "stops": 12,
+    "photo": "Grand-Place, Brussels - panorama, June 2018 (cropped).jpg",
+    "desc": "La Grand Place, el Manneken Pis, el palacio enterrado de Carlos V, el Sablon, el Barrio Europeo y el Atomium."
    }
   ]
  }
