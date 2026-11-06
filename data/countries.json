@@ -118,6 +118,22 @@
     "stops": 12,
     "photo": "Salamanca - Puente Romano y Catedral.jpg",
     "desc": "La Plaza Mayor, la Universidad y su rana, las dos Catedrales con el astronauta, la Casa de las Conchas, San Esteban y el Puente Romano."
+   },
+   {
+    "id": "segovia",
+    "name": "Segovia",
+    "routes": 3,
+    "stops": 11,
+    "photo": "Acueducto de Segovia 01.jpg",
+    "desc": "El Acueducto romano, la Plaza Mayor donde fue proclamada Isabel la Católica, la Dama de las Catedrales, el Alcázar de cuento y la Vera Cruz."
+   },
+   {
+    "id": "donostia",
+    "name": "San Sebastián",
+    "routes": 3,
+    "stops": 12,
+    "photo": "San Sebastian Kontxa beach 1190650.jpg",
+    "desc": "La Parte Vieja y sus pintxos, la plaza de la Constitución, el monte Urgull, la bahía de la Concha, el Palacio de Miramar y el Peine del Viento."
    }
   ]
  },
