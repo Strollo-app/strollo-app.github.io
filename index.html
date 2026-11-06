@@ -1497,9 +1497,12 @@ function renderZoneMap(){const box=$('#zoneMap');if(!box)return;if(ROUTES.length
     if(typeof L!=='undefined'){try{zmap=L.map('zmapBox',{zoomControl:false,attributionControl:false,rotate:false,rotateControl:false,touchRotate:false,scrollWheelZoom:false,tap:true});
       let zi=0,zok=0,zbad=0,zt=null;const ZP=['https://{s}.basemap.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png','https://tile.openstreetmap.org/{z}/{x}/{y}.png'];
       const zuse=()=>{if(zt)zmap.removeLayer(zt);zok=0;zbad=0;zt=L.tileLayer(ZP[zi],{maxZoom:18,subdomains:'abcd'}).addTo(zmap);zt.on('tileload',()=>zok++);zt.on('tileerror',()=>{zbad++;if(zbad>=3&&!zok&&zi<ZP.length-1){zi++;zuse()}});setTimeout(()=>{if(!zok&&zi<ZP.length-1){zi++;zuse()}},6000)};zuse();
-      ROUTES.forEach((r,i)=>{const col=ZCOL[i%ZCOL.length];const pts=r.stops.map(s=>[s.lat,s.lng]);const g=L.layerGroup().addTo(zmap);
-        const poly=pts.length>=3?L.polygon(zPad(zHull(pts)),{color:col,weight:2,fillColor:col,fillOpacity:.16,smoothFactor:2}):L.polyline(pts,{color:col,weight:8,opacity:.4});
-        poly.addTo(g);const c=poly.getBounds().getCenter();
+      ROUTES.forEach((r,i)=>{const col=ZCOL[i%ZCOL.length];const all=r.stops.map(s=>[s.lat,s.lng]);const g=L.layerGroup().addTo(zmap);
+        const md=k=>{const v=all.map(p=>p[k]).sort((a,b)=>a-b);return v[v.length>>1]};const m0=[md(0),md(1)];
+        const pts=all.filter(p=>distM(m0[0],m0[1],p[0],p[1])<2500),far=all.filter(p=>distM(m0[0],m0[1],p[0],p[1])>=2500);
+        const core=pts.length>=3?L.polygon(zPad(zHull(pts)),{color:col,weight:2,fillColor:col,fillOpacity:.16,smoothFactor:2}):pts.length===2?L.polyline(pts,{color:col,weight:8,opacity:.4}):L.circleMarker(pts[0]||all[0],{radius:14,color:col,weight:2,fillColor:col,fillOpacity:.16});
+        const poly=L.featureGroup([core,...far.map(p=>L.circleMarker(p,{radius:9,color:col,weight:2,fillColor:col,fillOpacity:.16}))]);
+        poly.addTo(g);const c=core.getBounds().getCenter();
         const lab=L.marker(c,{icon:L.divIcon({className:'zlab',html:`<span style="background:${col}">${esc(r.short)}</span>`,iconSize:null}),keyboard:false}).addTo(g);
         const go=()=>{setRoute(r.id)};poly.on('click',go);lab.on('click',go);zLayers[r.id]={poly,col}});
       setTimeout(()=>{zmap.invalidateSize();zmap.fitBounds(L.featureGroup(Object.values(zLayers).map(x=>x.poly)).getBounds(),{padding:[18,18]})},60)}catch(e){console.error(e);$('#zmapBox').hidden=true}}

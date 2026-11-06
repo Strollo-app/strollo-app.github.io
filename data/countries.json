@@ -70,6 +70,14 @@
     "stops": 11,
     "photo": "Plaza de España (Sevilla) - 01.jpg",
     "desc": "La catedral y la Giralda, el Real Alcázar, el barrio de Santa Cruz, la Plaza de España, Triana y el río Guadalquivir."
+   },
+   {
+    "id": "granada",
+    "name": "Granada",
+    "routes": 3,
+    "stops": 12,
+    "photo": "Granada - View from Mirador de San Nicolás - 02.jpg",
+    "desc": "La Alhambra y el Generalife, el Albaicín y el Mirador de San Nicolás, el Sacromonte, la Capilla Real y las tapas gratis."
    }
   ]
  },
