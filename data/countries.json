@@ -110,6 +110,14 @@
     "stops": 12,
     "photo": "Alcazaba de Málaga overview.jpg",
     "desc": "La Alcazaba y Gibralfaro, el Teatro Romano, la Manquita, el Museo Picasso y su casa natal, el puerto y los espetos de la Malagueta."
+   },
+   {
+    "id": "salamanca",
+    "name": "Salamanca",
+    "routes": 3,
+    "stops": 12,
+    "photo": "Salamanca - Puente Romano y Catedral.jpg",
+    "desc": "La Plaza Mayor, la Universidad y su rana, las dos Catedrales con el astronauta, la Casa de las Conchas, San Esteban y el Puente Romano."
    }
   ]
  },
