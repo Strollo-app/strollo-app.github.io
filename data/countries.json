@@ -78,6 +78,22 @@
     "stops": 12,
     "photo": "Granada - View from Mirador de San Nicolás - 02.jpg",
     "desc": "La Alhambra y el Generalife, el Albaicín y el Mirador de San Nicolás, el Sacromonte, la Capilla Real y las tapas gratis."
+   },
+   {
+    "id": "cordoba",
+    "name": "Córdoba",
+    "routes": 3,
+    "stops": 12,
+    "photo": "Centro Histórico, 16.9 -- 2023 -- Córdoba, España.jpg",
+    "desc": "La Mezquita-Catedral, la Judería y Maimónides, el Alcázar de Colón, los patios cordobeses, el Templo Romano y Medina Azahara."
+   },
+   {
+    "id": "valencia",
+    "name": "Valencia",
+    "routes": 3,
+    "stops": 12,
+    "photo": "Museo Príncipe Felipe, Ciudad de las Artes y las Ciencias, Valencia, España, 2014-06-29, DD 59.JPG",
+    "desc": "La Lonja de la Seda, el Santo Cáliz, el Tribunal de las Aguas, el Jardín del Turia, la Ciudad de las Artes, las Fallas, la paella y la horchata."
    }
   ]
  },
