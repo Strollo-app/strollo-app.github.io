@@ -94,6 +94,22 @@
     "stops": 12,
     "photo": "Museo Príncipe Felipe, Ciudad de las Artes y las Ciencias, Valencia, España, 2014-06-29, DD 59.JPG",
     "desc": "La Lonja de la Seda, el Santo Cáliz, el Tribunal de las Aguas, el Jardín del Turia, la Ciudad de las Artes, las Fallas, la paella y la horchata."
+   },
+   {
+    "id": "toledo",
+    "name": "Toledo",
+    "routes": 3,
+    "stops": 12,
+    "photo": "Panorama of Toledo at sunset. View from the south.jpg",
+    "desc": "La Catedral Primada, El Greco y el Conde de Orgaz, las sinagogas de la Judería, San Juan de los Reyes y el Mirador del Valle."
+   },
+   {
+    "id": "malaga",
+    "name": "Málaga",
+    "routes": 3,
+    "stops": 12,
+    "photo": "Alcazaba de Málaga overview.jpg",
+    "desc": "La Alcazaba y Gibralfaro, el Teatro Romano, la Manquita, el Museo Picasso y su casa natal, el puerto y los espetos de la Malagueta."
    }
   ]
  },
