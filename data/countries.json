@@ -260,6 +260,14 @@
     "stops": 12,
     "photo": "Tower Bridge London Dusk Feb 2006.jpg",
     "desc": "Trafalgar, el Big Ben y la abadía de Westminster, Buckingham, San Pablo, el Támesis, el Tower Bridge y la Torre de Londres."
+   },
+   {
+    "id": "edimburgo",
+    "name": "Edimburgo",
+    "routes": 3,
+    "stops": 11,
+    "photo": "",
+    "desc": "El castillo, la Royal Mile, Greyfriars, Calton Hill, la Ciudad Nueva georgiana, Holyrood y Arthur's Seat."
    }
   ]
  },
