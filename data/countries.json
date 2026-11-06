@@ -197,6 +197,22 @@
     "stops": 14,
     "photo": "Colosseum in Rome-April 2007-1- copie 2B.jpg",
     "desc": "El Coliseo, el Foro, el Panteón, la Fontana de Trevi, la plaza Navona, Trastevere, San Pedro y la Capilla Sixtina."
+   },
+   {
+    "id": "venecia",
+    "name": "Venecia",
+    "routes": 3,
+    "stops": 12,
+    "photo": "Canal Grande Chiesa della Salute e Dogana dal ponte dell Accademia.jpg",
+    "desc": "San Marco y el Palacio Ducal, el Puente de los Suspiros, Rialto, el primer gueto del mundo, las góndolas y la Salute."
+   },
+   {
+    "id": "florencia",
+    "name": "Florencia",
+    "routes": 3,
+    "stops": 13,
+    "photo": "Florence Cathedral seen from Piazzale Michelangelo night dllu.jpg",
+    "desc": "La cúpula de Brunelleschi, los Uffizi, el Ponte Vecchio, el David de Miguel Ángel, los Médici y la española Leonor de Toledo."
    }
   ]
  },
