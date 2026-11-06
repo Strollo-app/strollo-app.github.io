@@ -182,5 +182,22 @@
     "desc": "Trafalgar, el Big Ben y la abadía de Westminster, Buckingham, San Pablo, el Támesis, el Tower Bridge y la Torre de Londres."
    }
   ]
+ },
+ {
+  "name": "Italia",
+  "photo": "Colosseum in Rome-April 2007-1- copie 2B.jpg",
+  "desc": "Ruinas, fuentes, pasta y el arte del Renacimiento.",
+  "id": "it",
+  "file": "data/it.json",
+  "cities": [
+   {
+    "id": "roma",
+    "name": "Roma",
+    "routes": 3,
+    "stops": 14,
+    "photo": "Colosseum in Rome-April 2007-1- copie 2B.jpg",
+    "desc": "El Coliseo, el Foro, el Panteón, la Fontana de Trevi, la plaza Navona, Trastevere, San Pedro y la Capilla Sixtina."
+   }
+  ]
  }
 ]
