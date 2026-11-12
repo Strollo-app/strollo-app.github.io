@@ -456,5 +456,22 @@
     "desc": "Asakusa y Sensō-ji, Ueno, el cruce de Shibuya, Harajuku, el santuario Meiji, el Palacio Imperial, Ginza y Tsukiji."
    }
   ]
+ },
+ {
+  "name": "Tailandia",
+  "photo": "",
+  "desc": "Templos dorados, mercados flotantes, selva y playas, y una cocina inolvidable.",
+  "id": "th",
+  "file": "data/th.json",
+  "cities": [
+   {
+    "id": "bangkok",
+    "name": "Bangkok",
+    "routes": 3,
+    "stops": 12,
+    "photo": "",
+    "desc": "El Gran Palacio, Wat Pho y Wat Arun, Chinatown, la casa de Jim Thompson, Siam y el parque Lumphini."
+   }
+  ]
  }
 ]
