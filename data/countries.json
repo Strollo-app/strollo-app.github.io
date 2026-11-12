@@ -471,6 +471,14 @@
     "stops": 12,
     "photo": "",
     "desc": "El Gran Palacio, Wat Pho y Wat Arun, Chinatown, la casa de Jim Thompson, Siam y el parque Lumphini."
+   },
+   {
+    "id": "chiangmai",
+    "name": "Chiang Mai",
+    "routes": 3,
+    "stops": 10,
+    "photo": "",
+    "desc": "La ciudad vieja de Lanna, Wat Chedi Luang, Doi Suthep, los mercados de Warorot y el Night Bazaar."
    }
   ]
  }
