@@ -439,5 +439,22 @@
     "desc": "La plaza del Mercado, Santa María y su retablo, Wawel, el dragón, Kazimierz y la fábrica de Schindler."
    }
   ]
+ },
+ {
+  "name": "Japón",
+  "photo": "",
+  "desc": "Templos y rascacielos, trenes puntuales, cocina de otro mundo y una capital que nunca se detiene.",
+  "id": "jp",
+  "file": "data/jp.json",
+  "cities": [
+   {
+    "id": "tokio",
+    "name": "Tokio",
+    "routes": 3,
+    "stops": 12,
+    "photo": "",
+    "desc": "Asakusa y Sensō-ji, Ueno, el cruce de Shibuya, Harajuku, el santuario Meiji, el Palacio Imperial, Ginza y Tsukiji."
+   }
+  ]
  }
 ]
