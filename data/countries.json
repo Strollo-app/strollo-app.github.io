@@ -487,6 +487,14 @@
     "stops": 10,
     "photo": "",
     "desc": "La torre del reloj, el Buda Esmeralda, el Templo Blanco, la Casa Negra, el Templo Azul y el Triángulo de Oro."
+   },
+   {
+    "id": "krabi",
+    "name": "Krabi",
+    "routes": 3,
+    "stops": 10,
+    "photo": "",
+    "desc": "Krabi Town, Railay y Phra Nang, el templo de la Cueva del Tigre, la Piscina Esmeralda y las aguas termales."
    }
   ]
  }
