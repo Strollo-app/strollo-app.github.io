@@ -479,6 +479,14 @@
     "stops": 10,
     "photo": "",
     "desc": "La ciudad vieja de Lanna, Wat Chedi Luang, Doi Suthep, los mercados de Warorot y el Night Bazaar."
+   },
+   {
+    "id": "chiangrai",
+    "name": "Chiang Rai",
+    "routes": 3,
+    "stops": 10,
+    "photo": "",
+    "desc": "La torre del reloj, el Buda Esmeralda, el Templo Blanco, la Casa Negra, el Templo Azul y el Triángulo de Oro."
    }
   ]
  }
