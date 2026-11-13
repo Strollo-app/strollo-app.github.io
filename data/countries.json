@@ -492,7 +492,7 @@
     "id": "chiangrai",
     "name": "Chiang Rai",
     "routes": 3,
-    "stops": 10,
+    "stops": 14,
     "photo": "Chiang Rai - Wat Rong Khun วัดร่องขุ่น (2026) - img 11.jpg",
     "desc": "La torre del reloj, el Buda Esmeralda, el Templo Blanco, la Casa Negra, el Templo Azul y el Triángulo de Oro."
    },
@@ -500,7 +500,7 @@
     "id": "krabi",
     "name": "Krabi",
     "routes": 3,
-    "stops": 10,
+    "stops": 12,
     "photo": "Phra Nang beach panorama edit.jpg",
     "desc": "Krabi Town, Railay y Phra Nang, el templo de la Cueva del Tigre, la Piscina Esmeralda y las aguas termales."
    },
@@ -508,7 +508,7 @@
     "id": "kotao",
     "name": "Ko Tao",
     "routes": 3,
-    "stops": 9,
+    "stops": 12,
     "photo": "Ko Nang Yuan from Viewpoint.jpg",
     "desc": "Mae Haad, la playa de Sairee, Shark Bay, el mirador de John-Suwan y la isla de Ko Nang Yuan."
    }
