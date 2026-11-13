@@ -1541,7 +1541,7 @@ function renderRoute(){
   const total=seq(R).reduce((a,s)=>a+s.dur,0);
   $('#hero').innerHTML=`<svg class="waves ico" viewBox="0 0 48 48" aria-hidden="true"><use href="#i-${R.icon}"/></svg>
     <div class="eyebrow">${esc(R.eyebrow)}</div><h1>${R.title}</h1><p>${esc(R.desc)}</p>
-    <div class="stats"><div><b>${R.main.length}${R.stops.length>R.main.length?'+'+(R.stops.length-R.main.length):''}</b><span>Paradas</span></div><div><b>${R.km}</b><span>A pie</span></div><div><b>${Math.round(total/60)} min</b><span>Audio</span></div><div><b>${esc(R.key[0])}</b><span>${esc(R.key[1])}</span></div></div><div class="stripe"></div>`;
+    <div class="stats"><div><b>${R.main.length}${R.stops.length>R.main.length?'+'+(R.stops.length-R.main.length):''}</b><span>Paradas</span></div><div><b>${R.km}</b><span>${esc(R.kmLabel||'A pie')}</span></div><div><b>${Math.round(total/60)} min</b><span>Audio</span></div><div><b>${esc(R.key[0])}</b><span>${esc(R.key[1])}</span></div></div><div class="stripe"></div>`;
   $('#introCard').innerHTML=`<div class="art">${ico('headphones')}</div><div><b>${esc(R.intro.name)}</b><span>${fmt(R.intro.dur)} · ${esc(R.intro.hint)}</span></div><button class="pbtn" data-play="${R.intro.id}" aria-label="Escuchar la introducción">${ico('play')}</button>`;
   const t=todayISO();
   $('#alerts').innerHTML=R.alerts.filter(a=>!a.day||a.day===t).map(a=>`<div class="card alert${a.hot?' today':''}"><div class="badge">${ico(a.icon)}</div><p><strong>${esc(a.t)}</strong>${esc(a.d)}</p></div>`).join('')+
@@ -1551,7 +1551,7 @@ function renderRoute(){
 }
 function renderList(){
   $('#list').innerHTML=R.stops.map(s=>{
-    const wl=s.extra?`<li class="walkline" aria-hidden="true">Extra · ${s.walk} min desde ${esc(byId[s.from].name)}</li>`:(s.walk?`<li class="walkline" aria-hidden="true">${s.walk} min a pie</li>`:'');
+    const wl=s.extra?`<li class="walkline" aria-hidden="true">Extra · ${s.walk} min desde ${esc(byId[s.from].name)}</li>`:(s.walk?`<li class="walkline" aria-hidden="true">${s.walk} min ${esc(s.by||'a pie')}</li>`:'');
     const qa=quiz[s.id];
     return wl+`<li><button class="srow${done.has(s.id)?' is-done':''}" data-open="${s.id}">
       <div class="thumb">${coverBg(s)}<span class="n">${s.extra?'EXTRA':num(s)}</span>${ico(s.icon)}<span class="done">${ico('check')}</span></div>
@@ -1619,7 +1619,7 @@ function openSheet(id){
     <div class="chips">
       <button class="chip primary" id="goBtn">${ico('route')}Llevarme aquí</button>
       <a class="chip" href="${maps}" target="_blank" rel="noopener">${ico('pin')}Google Maps</a>
-      ${s.walk?`<span class="chip">${ico('walk')}${s.extra?s.walk+' min desde '+esc(byId[s.from].name):s.walk+' min desde la anterior'}</span>`:`<span class="chip">${ico('walk')}Punto de salida</span>`}
+      ${s.walk?`<span class="chip">${ico('walk')}${s.extra?s.walk+' min desde '+esc(byId[s.from].name):s.walk+' min '+(s.by?s.by+' ':'')+'desde la anterior'}</span>`:`<span class="chip">${ico('walk')}Punto de salida</span>`}
       <button class="chip done" id="doneBtn" aria-pressed="${done.has(s.id)}">${ico('check')}<span>${done.has(s.id)?'Hecha':'Marcar como hecha'}</span></button>
     </div>
     <div class="card block"><h3>Qué mirar</h3><ul class="look">${s.look.map((l,k)=>`<li><i>${k+1}</i><span>${esc(l)}</span></li>`).join('')}</ul></div>
