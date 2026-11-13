@@ -266,7 +266,7 @@
     "name": "Edimburgo",
     "routes": 3,
     "stops": 11,
-    "photo": "",
+    "photo": "Edinburgh Castle from Princes Street Gardens - geograph.org.uk - 1848175.jpg",
     "desc": "El castillo, la Royal Mile, Greyfriars, Calton Hill, la Ciudad Nueva georgiana, Holyrood y Arthur's Seat."
    }
   ]
@@ -442,7 +442,7 @@
  },
  {
   "name": "Japón",
-  "photo": "",
+  "photo": "Hondo (Main Hall) of Sensoji Temple.jpg",
   "desc": "Templos y rascacielos, trenes puntuales, cocina de otro mundo y una capital que nunca se detiene.",
   "id": "jp",
   "file": "data/jp.json",
@@ -452,14 +452,14 @@
     "name": "Tokio",
     "routes": 3,
     "stops": 12,
-    "photo": "",
+    "photo": "Hondo (Main Hall) of Sensoji Temple.jpg",
     "desc": "Asakusa y Sensō-ji, Ueno, el cruce de Shibuya, Harajuku, el santuario Meiji, el Palacio Imperial, Ginza y Tsukiji."
    }
   ]
  },
  {
   "name": "Tailandia",
-  "photo": "",
+  "photo": "Wat Arun from Chao Phraya River.jpg",
   "desc": "Templos dorados, mercados flotantes, selva y playas, y una cocina inolvidable.",
   "id": "th",
   "file": "data/th.json",
@@ -469,7 +469,7 @@
     "name": "Bangkok",
     "routes": 3,
     "stops": 12,
-    "photo": "",
+    "photo": "Wat Arun from Chao Phraya River.jpg",
     "desc": "El Gran Palacio, Wat Pho y Wat Arun, Chinatown, la casa de Jim Thompson, Siam y el parque Lumphini."
    },
    {
@@ -477,7 +477,7 @@
     "name": "Chiang Mai",
     "routes": 3,
     "stops": 10,
-    "photo": "",
+    "photo": "20171105 Wat Chedi Luang Chiang Mai 9897 DxO.jpg",
     "desc": "La ciudad vieja de Lanna, Wat Chedi Luang, Doi Suthep, los mercados de Warorot y el Night Bazaar."
    },
    {
@@ -485,7 +485,7 @@
     "name": "Chiang Rai",
     "routes": 3,
     "stops": 10,
-    "photo": "",
+    "photo": "Chiang Rai - Wat Rong Khun วัดร่องขุ่น (2026) - img 11.jpg",
     "desc": "La torre del reloj, el Buda Esmeralda, el Templo Blanco, la Casa Negra, el Templo Azul y el Triángulo de Oro."
    },
    {
@@ -493,7 +493,7 @@
     "name": "Krabi",
     "routes": 3,
     "stops": 10,
-    "photo": "",
+    "photo": "Phra Nang beach panorama edit.jpg",
     "desc": "Krabi Town, Railay y Phra Nang, el templo de la Cueva del Tigre, la Piscina Esmeralda y las aguas termales."
    },
    {
@@ -501,7 +501,7 @@
     "name": "Ko Tao",
     "routes": 3,
     "stops": 9,
-    "photo": "",
+    "photo": "Ko Nang Yuan from Viewpoint.jpg",
     "desc": "Mae Haad, la playa de Sairee, Shark Bay, el mirador de John-Suwan y la isla de Ko Nang Yuan."
    }
   ]
