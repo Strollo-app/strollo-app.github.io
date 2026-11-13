@@ -1156,6 +1156,21 @@ button.go{border:0;background:transparent;cursor:pointer;padding:2px 0;font:inhe
 .city small{font-size:.8rem;color:var(--muted)}
 .city .go-ic{width:20px;height:20px;color:var(--muted)}
 .city.cur{background:color-mix(in srgb,var(--sea-2) 14%,transparent)}.curtag{font-style:normal;font-weight:600;color:var(--cay)}
+.hsearch{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:0 14px;box-shadow:var(--shadow)}
+.hsearch .ico{width:18px;height:18px;color:var(--muted);flex:none}
+.hsearch input{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font:inherit;font-size:1rem;padding:14px 0;outline:0}
+.hsec{margin:6px 2px -6px;font-family:var(--f-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:400}
+.hfeat{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;padding:2px 2px 6px;margin:0 -2px}
+.feat{position:relative;flex:none;width:150px;height:110px;border-radius:16px;overflow:hidden;border:0;background:var(--sea);color:#fff;cursor:pointer;text-align:left;scroll-snap-align:start;display:flex;align-items:flex-end}
+.feat img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.feat::after,.ctile::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(0,0,0,.72))}
+.feat span,.ctile span{position:relative;z-index:1;padding:10px 12px;display:block}
+.feat b,.ctile b{display:block;font-family:var(--f-display);font-weight:400;font-size:1.15rem;line-height:1.1}
+.feat small,.ctile small{font-size:.72rem;opacity:.9}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ctile{position:relative;height:96px;border-radius:16px;overflow:hidden;border:2px solid transparent;background:var(--sea);color:#fff;cursor:pointer;text-align:left;display:flex;align-items:flex-end;padding:0}
+.ctile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ctile.on{border-color:var(--cay)}
 .soon{border:2px dashed var(--line);border-radius:22px;padding:18px;color:var(--muted);text-align:center;font-size:.9rem}
 
 /* Info */
@@ -1418,7 +1433,7 @@ button.go{border:0;background:transparent;cursor:pointer;padding:2px 0;font:inhe
  <div class="home-hero pad"><div class="inner">
   <div class="home-brand"><span class="logo"><svg class="ico" style="width:22px;height:22px"><use href="#i-route"/></svg></span><b>Strollo</b></div>
   <h1>¿Dónde paseamos?</h1>
-  <p>Rutas a pie con audioguía, mapa, navegación y dónde comer. Elige país y ciudad.</p>
+  <p>Rutas a pie con audioguía, mapa, navegación y dónde comer. Busca tu ciudad o elige país.</p>
  </div><div class="stripe"></div></div>
  <div class="pad"><div class="inner stack" id="countries" style="padding-block:20px 16px"><p class="empty">Cargando destinos…</p></div></div>
  <div class="pad"><div class="inner" style="padding-bottom:8px"><a class="card intro igcard" href="https://www.instagram.com/strollo.tours" target="_blank" rel="noopener"><div class="art" style="background:linear-gradient(135deg,#F58529,#DD2A7B 55%,#8134AF);color:#fff"><svg class="ico" viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></div><div><b>Síguenos en Instagram</b><span>@strollo.tours · curiosidades, rutas nuevas y vuestras tarjetas de pasaporte</span></div></a><div class="card block sharecard" data-share style="margin-top:12px"></div></div></div>
@@ -2456,13 +2471,35 @@ async function getJSON(u){const r=await fetch(u,{cache:'no-cache'});if(!r.ok)thr
   if(!c){n.textContent='Escribe al menos el nombre de la ciudad.';document.getElementById('sgCity').focus();return}
   const to='';const body=`Ciudad: ${c}\nCuándo: ${w||'-'}\nComentario: ${m||'-'}\n\n(Enviado desde Strollo)`;
   location.href=`mailto:${to}?subject=${encodeURIComponent('Strollo · Sugerencia de ciudad: '+c)}&body=${encodeURIComponent(body)}`;n.textContent='¡Gracias! Si no se abre tu correo, escríbenos con el nombre de la ciudad.'}})();
+let openC=null,q='';
+const norm=t=>String(t).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const cityRow=(c,x,cur,sub)=>`<button class="city${cur&&cur.c===c.id&&cur.city===x.id?' cur':''}" data-c="${c.id}" data-city="${x.id}"><span class="th">${x.photo?`<img src="${fp(x.photo,200)}" alt="" loading="lazy" onerror="this.remove()">`:''}</span><span><b>${esc(x.name)}</b><small>${sub?esc(c.name)+' · ':''}${cur&&cur.c===c.id&&cur.city===x.id?'<em class="curtag">Última visitada</em> · ':''}${x.routes} rutas · ${x.stops} paradas</small></span><svg class="ico go-ic"><use href="#i-chev"/></svg></button>`;
 function renderHome(){
   const cur=started||st.get('strollo-dest',null);
-  $('#countries').innerHTML=COUNTRIES.map(c=>{const nr=c.cities.reduce((a,x)=>a+x.routes,0),ns=c.cities.reduce((a,x)=>a+x.stops,0);
-    return `<article class="country"><div class="c-cover">${c.photo?`<img src="${fp(c.photo,900)}" alt="" onerror="this.remove()">`:''}<div class="ct"><h2>${esc(c.name)}</h2><span>${c.cities.length} ${c.cities.length===1?'ciudad':'ciudades'} · ${nr} rutas · ${ns} paradas</span></div></div>
-    <p class="c-desc">${esc(c.desc||'')}</p><div class="cities">${c.cities.map(x=>`<button class="city${cur&&cur.c===c.id&&cur.city===x.id?' cur':''}" data-c="${c.id}" data-city="${x.id}"><span class="th">${x.photo?`<img src="${fp(x.photo,200)}" alt="" onerror="this.remove()">`:''}</span><span><b>${esc(x.name)}</b><small>${cur&&cur.c===c.id&&cur.city===x.id?'<em class="curtag">Última visitada</em> · ':''}${x.routes} rutas · ${x.stops} paradas</small></span><svg class="ico go-ic"><use href="#i-chev"/></svg></button>`).join('')}</div></article>`}).join('')+
-    `<div class="soon">Más países muy pronto.</div>`;
-  document.querySelectorAll('[data-city]').forEach(b=>b.onclick=()=>choose(b.dataset.c,b.dataset.city));
+  const box=$('#countries');
+  const keep=document.getElementById('hq');const hadFocus=keep&&document.activeElement===keep;
+  let h=`<div class="hsearch"><svg class="ico"><use href="#i-pin"/></svg><input id="hq" type="search" placeholder="Buscar ciudad o país…" autocomplete="off" value="${esc(q)}"></div>`;
+  const nq=norm(q.trim());
+  if(nq){
+    const rows=[];COUNTRIES.forEach(c=>c.cities.forEach(x=>{if(norm(x.name).includes(nq)||norm(c.name).includes(nq))rows.push(cityRow(c,x,cur,true))}));
+    h+=rows.length?`<div class="country"><div class="cities">${rows.join('')}</div></div>`:`<p class="empty">No hay resultados para «${esc(q)}».</p>`;
+  }else{
+    const cc=cur&&COUNTRIES.find(c=>c.id===cur.c),cx=cc&&cc.cities.find(x=>x.id===cur.city);
+    if(cx)h+=`<h3 class="hsec">Continuar</h3><div class="country"><div class="cities">${cityRow(cc,cx,cur,true)}</div></div>`;
+    const all=[];COUNTRIES.forEach(c=>c.cities.forEach(x=>all.push([c,x])));
+    const top=all.slice().sort((a,b)=>b[1].stops-a[1].stops).slice(0,8);
+    h+=`<h3 class="hsec">Destacadas</h3><div class="hfeat">${top.map(([c,x])=>`<button class="feat" data-c="${c.id}" data-city="${x.id}">${x.photo?`<img src="${fp(x.photo,400)}" alt="" loading="lazy" onerror="this.remove()">`:''}<span><b>${esc(x.name)}</b><small>${esc(c.name)}</small></span></button>`).join('')}</div>`;
+    h+=`<h3 class="hsec">Países</h3><div class="cgrid">${COUNTRIES.map(c=>`<button class="ctile${openC===c.id?' on':''}" data-ctry="${c.id}">${c.photo?`<img src="${fp(c.photo,500)}" alt="" loading="lazy" onerror="this.remove()">`:''}<span><b>${esc(c.name)}</b><small>${c.cities.length} ${c.cities.length===1?'ciudad':'ciudades'}</small></span></button>`).join('')}</div>`;
+    const oc=COUNTRIES.find(c=>c.id===openC);
+    if(oc)h+=`<div class="country" id="copen"><p class="c-desc">${esc(oc.desc||'')}</p><div class="cities">${oc.cities.map(x=>cityRow(oc,x,cur,false)).join('')}</div></div>`;
+    h+=`<div class="soon">Más países muy pronto.</div>`;
+  }
+  box.innerHTML=h;
+  const qi=document.getElementById('hq');
+  qi.oninput=()=>{q=qi.value;const pos=qi.selectionStart;renderHome();const n=document.getElementById('hq');n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}};
+  if(hadFocus)qi.focus();
+  box.querySelectorAll('[data-city]').forEach(b=>b.onclick=()=>choose(b.dataset.c,b.dataset.city));
+  box.querySelectorAll('[data-ctry]').forEach(b=>b.onclick=()=>{openC=openC===b.dataset.ctry?null:b.dataset.ctry;renderHome();if(openC){const e=document.getElementById('copen');if(e)e.scrollIntoView({behavior:'smooth',block:'nearest'})}});
 }
 function showHome(){renderHome();$('#home').hidden=false;$('#home').scrollTop=0}
 function hideHome(){$('#home').hidden=true}
