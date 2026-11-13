@@ -1511,7 +1511,7 @@ function renderZoneMap(){const box=$('#zoneMap');if(!box)return;if(ROUTES.length
         const pts=all.filter(p=>distM(m0[0],m0[1],p[0],p[1])<2500),far=all.filter(p=>distM(m0[0],m0[1],p[0],p[1])>=2500);
         const core=pts.length>=3?L.polygon(zPad(zHull(pts)),{color:col,weight:2,fillColor:col,fillOpacity:.16,smoothFactor:2}):pts.length===2?L.polyline(pts,{color:col,weight:8,opacity:.4}):L.circleMarker(pts[0]||all[0],{radius:14,color:col,weight:2,fillColor:col,fillOpacity:.16});
         const poly=L.featureGroup([core,...far.map(p=>L.circleMarker(p,{radius:9,color:col,weight:2,fillColor:col,fillOpacity:.16}))]);
-        poly.addTo(g);const c=core.getBounds().getCenter();
+        poly.addTo(g);const c=core.getBounds?core.getBounds().getCenter():core.getLatLng();
         const lab=L.marker(c,{icon:L.divIcon({className:'zlab',html:`<span style="background:${col}">${esc(r.short)}</span>`,iconSize:null}),keyboard:false}).addTo(g);
         const go=()=>{setRoute(r.id)};poly.on('click',go);lab.on('click',go);zLayers[r.id]={poly,col}});
       setTimeout(()=>{zmap.invalidateSize();zmap.fitBounds(L.featureGroup(Object.values(zLayers).map(x=>x.poly)).getBounds(),{padding:[18,18]})},60)}catch(e){console.error(e);$('#zmapBox').hidden=true}}
