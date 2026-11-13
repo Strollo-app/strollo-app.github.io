@@ -476,7 +476,7 @@
     "id": "bangkok",
     "name": "Bangkok",
     "routes": 3,
-    "stops": 12,
+    "stops": 18,
     "photo": "Wat Arun from Chao Phraya River.jpg",
     "desc": "El Gran Palacio, Wat Pho y Wat Arun, Chinatown, la casa de Jim Thompson, Siam y el parque Lumphini."
    },
@@ -484,7 +484,7 @@
     "id": "chiangmai",
     "name": "Chiang Mai",
     "routes": 3,
-    "stops": 10,
+    "stops": 14,
     "photo": "20171105 Wat Chedi Luang Chiang Mai 9897 DxO.jpg",
     "desc": "La ciudad vieja de Lanna, Wat Chedi Luang, Doi Suthep, los mercados de Warorot y el Night Bazaar."
    },
