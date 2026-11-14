@@ -458,10 +458,10 @@
    {
     "id": "tokio",
     "name": "Tokio",
-    "routes": 3,
-    "stops": 20,
+    "routes": 6,
+    "stops": 40,
     "photo": "Hondo (Main Hall) of Sensoji Temple.jpg",
-    "desc": "Asakusa y Sensō-ji, Ueno, el cruce de Shibuya, Harajuku, el santuario Meiji, el Palacio Imperial, Ginza y Tsukiji."
+    "desc": "Asakusa, Ueno, Shibuya, Harajuku, el Palacio Imperial, Ginza, Shinjuku, Akihabara, Yanaka, Toyosu, teamLab y Odaiba."
    }
   ]
  },
