@@ -175,7 +175,7 @@
   "name": "Alemania",
   "file": "data/de.json",
   "photo": "Brandenburger Tor abends.jpg",
-  "desc": "Historia del siglo XX, museos, muro y currywurst.",
+  "desc": "Berlín, con su historia del siglo XX, el Muro y el currywurst, y Colonia, con su catedral, el Rin y la cerveza Kölsch.",
   "cities": [
    {
     "id": "berlin",
@@ -184,6 +184,14 @@
     "stops": 15,
     "photo": "Fernsehturm, Alexanderplatz, Berlin.jpg",
     "desc": "El Reichstag, la Puerta de Brandeburgo, la Isla de los Museos, el Muro y el Kreuzberg alternativo."
+   },
+   {
+    "id": "colonia",
+    "name": "Colonia",
+    "routes": 3,
+    "stops": 13,
+    "photo": "Kölner Dom - Westfassade 2022 ohne Gerüst-0968.jpg",
+    "desc": "La catedral gótica, el casco antiguo, el Rin con su puente de candados, el museo del chocolate y la cerveza Kölsch."
    }
   ]
  },
