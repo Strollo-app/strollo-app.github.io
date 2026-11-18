@@ -1,6 +1,6 @@
 // Service worker: la app y los audios funcionan sin conexión una vez descargados.
 const CACHE = 'kdk-v3';
-const VERSION = '2026-11-18a';
+const VERSION = '2026-11-18b';
 
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
