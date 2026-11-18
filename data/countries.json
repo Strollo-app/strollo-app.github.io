@@ -317,6 +317,14 @@
     "stops": 17,
     "photo": "Duomo di Ortigia (Siracusa).jpg",
     "desc": "Ortigia, el templo de Apolo, la catedral construida dentro de un templo griego, el teatro griego y la tierra de Arquímedes."
+   },
+   {
+    "id": "catania",
+    "name": "Catania",
+    "routes": 3,
+    "stops": 11,
+    "photo": "Liotru Fontana dellElefante (1221745427).jpg",
+    "desc": "La ciudad negra a los pies del Etna: la plaza del elefante, la catedral de Santa Águeda, la Pescheria, el teatro romano y la Via Etnea."
    }
   ]
  },
