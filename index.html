@@ -1066,7 +1066,8 @@ details.script p{margin:.8em 0 0;max-width:65ch;color:var(--ink)}
 .copyline small{font:500 .7rem var(--f-body);color:var(--muted);margin-left:4px}
 .obar{height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:8px}
 .obar i{display:block;height:100%;background:var(--ok);width:0;transition:width .2s}
-#offline,#nearCard{grid-template-columns:auto 1fr auto}
+#offline,#nearCard,#gfNear{grid-template-columns:auto 1fr auto}
+.gfdist{display:inline-flex;margin-left:6px;margin-bottom:4px;font-family:var(--f-mono);font-size:.66rem;letter-spacing:.04em;padding:3px 9px;border-radius:999px;background:var(--bg-2,rgba(0,0,0,.06));color:var(--ink,inherit);font-weight:600}
 .zf{padding-bottom:4px}
 .stack > *{min-width:0}
 .intro > div{min-width:0}
@@ -1362,6 +1363,7 @@ button.go{border:0;background:transparent;cursor:pointer;padding:2px 0;font:inhe
      <span><i class="lv lv2"></i>Menú sin gluten y cocina preparada</span>
      <span><i class="lv lv3"></i>Opciones, con precaución</span>
     </div>
+    <div class="card intro gfnear" id="gfNear"></div>
     <div class="filters zf" id="gzfilters" role="group" aria-label="Zona"></div>
     <div class="sec-title" style="margin-top:4px"><h2 id="gfZoneTitle" style="font-size:1.3rem">Sin gluten</h2></div>
     <div class="stack" id="gfplaces" style="gap:10px"></div>
@@ -2337,6 +2339,17 @@ const PLACES=CI.places||[];
 const GF=CI.gfPlaces||[];
 const RCATS=["Todo","Comida","Pescado","Picoteo","Dulce","Café","Noche"];let rcat="Todo";
 function zoneChips(el,onPick){el.innerHTML=ZONES.map(z=>`<button aria-pressed="${z[0]===zone}" data-z="${z[0]}">${esc(z[1])}</button>`).join('');el.querySelectorAll('[data-z]').forEach(b=>b.onclick=()=>{zone=b.dataset.z;onPick()})}
+let gfPos=null,gfNearOn=false;
+function renderGfNear(msg){
+  const el=$('#gfNear');if(!el)return;
+  el.innerHTML=`<div class="art" style="background:var(--ok-soft);color:var(--ok)">${ico('locate')}</div><div><b>Sin gluten cerca de mí</b><span>${msg||(gfNearOn&&gfPos?'Ordenado por distancia desde tu ubicación. Las distancias son en línea recta.':'Usa tu ubicación para ver los sitios sin gluten más cercanos, de todas las zonas.')}</span></div><button class="go" id="gfNearBtn">${gfNearOn&&gfPos?'Ver por zonas':'Buscar'}</button>`;
+  $('#gfNearBtn').onclick=()=>{
+    if(gfNearOn&&gfPos){gfNearOn=false;renderFood();return}
+    if(!navigator.geolocation){renderGfNear('Este navegador no comparte la ubicación.');return}
+    renderGfNear('Buscando tu ubicación…');
+    navigator.geolocation.getCurrentPosition(p=>{gfPos={lat:p.coords.latitude,lng:p.coords.longitude};gfNearOn=true;renderFood()},e=>{renderGfNear(typeof geoMsg==='function'?geoMsg(e):'No se pudo obtener tu ubicación.')},{enableHighAccuracy:false,timeout:20000,maximumAge:60000});
+  };
+}
 function renderFood(){
   zone=zone||R.id;
   zoneChips($('#zfilters'),renderFood);zoneChips($('#gzfilters'),renderFood);
@@ -2345,7 +2358,18 @@ function renderFood(){
   const pl=PLACES.filter(p=>p.zone===zone&&(rcat==='Todo'||p.t.includes(rcat)));
   $('#places').innerHTML=pl.length?pl.map(p=>`<div class="card place"><div class="art" style="background:${grad(p.h)}">${ico(p.i)}</div><div style="min-width:0"><div class="row"><b>${esc(p.n)}</b><button class="go" data-onmap="${esc(p.q)}" data-zone="${p.zone}">${ico('map')}Ver en el mapa</button></div><div class="mono" style="font-size:.7rem;color:var(--muted)">${esc(p.z)}</div><p>${esc(p.d)}</p>${p.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}${p.gf?'<span class="tag" style="background:var(--ok-soft);color:var(--ok)">Sin gluten</span>':''}<a class="gmaps" href="${mapsQ(p.q)}" target="_blank" rel="noopener">Abrir en Google Maps ↗</a></div></div>`).join(''):`<p class="empty">No hay sitios de este tipo en esta zona. Prueba con «Todo».</p>`;
   const LVL={1:"100 % sin gluten",2:"Menú sin gluten",3:"Opciones · precaución"};
-  $('#gfplaces').innerHTML=GF.filter(p=>p.zone===zone).map(p=>`<div class="card place${p.far?' far':''}"><div class="art" style="background:${p.l===1?'var(--ok)':p.l===2?'var(--sea-2)':'var(--cay)'}">${ico(p.i)}</div><div style="min-width:0"><span class="gflevel l${p.l}">${LVL[p.l]}</span><div class="row"><b>${esc(p.n)}</b><button class="go" data-onmap="${esc(p.q)}" data-zone="${p.zone}">${ico('map')}Ver en el mapa</button></div><div class="mono" style="font-size:.7rem;color:var(--muted)">${esc(p.z)}</div><p>${esc(p.d)}</p><p class="note">${esc(p.note)}</p><a class="gmaps" href="${mapsQ(p.q)}" target="_blank" rel="noopener">Abrir en Google Maps ↗</a></div></div>`).join('');
+  const gfCard=(p,d)=>`<div class="card place${p.far?' far':''}"><div class="art" style="background:${p.l===1?'var(--ok)':p.l===2?'var(--sea-2)':'var(--cay)'}">${ico(p.i)}</div><div style="min-width:0"><span class="gflevel l${p.l}">${LVL[p.l]}</span>${d!=null?`<span class="gfdist">${fmtDist(d)}</span>`:''}<div class="row"><b>${esc(p.n)}</b><button class="go" data-onmap="${esc(p.q)}" data-zone="${p.zone}">${ico('map')}Ver en el mapa</button></div><div class="mono" style="font-size:.7rem;color:var(--muted)">${esc(p.z)}</div><p>${esc(p.d)}</p><p class="note">${esc(p.note)}</p><a class="gmaps" href="${mapsQ(p.q)}" target="_blank" rel="noopener">Abrir en Google Maps ↗</a></div></div>`;
+  renderGfNear();
+  if(gfNearOn&&gfPos){
+    $('#gzfilters').hidden=true;
+    const withLL=GF.filter(p=>p.ll).map(p=>({p,d:distM(gfPos.lat,gfPos.lng,p.ll[0],p.ll[1])})).sort((a,b)=>a.d-b.d).slice(0,10);
+    $('#gfZoneTitle').textContent='Sin gluten · más cerca de ti';
+    $('#gfplaces').innerHTML=withLL.length?(withLL[0].d>25000?'<div class="card block"><p style="margin:0;color:var(--muted)">Parece que estás lejos de '+esc(CI.name)+'. Estos son los sitios más cercanos de todos modos.</p></div>':'')+withLL.map(x=>gfCard(x.p,x.d)).join(''):'<div class="card block"><p style="margin:0;color:var(--muted)">Todavía no tenemos las coordenadas de estos sitios. Usad las zonas.</p></div>';
+    $$('[data-onmap]').forEach(b=>b.onclick=()=>showOnMap(b.dataset.onmap,b.dataset.zone));
+    return;
+  }
+  $('#gzfilters').hidden=false;
+  $('#gfplaces').innerHTML=GF.filter(p=>p.zone===zone).map(p=>gfCard(p,null)).join('');
   $$('[data-onmap]').forEach(b=>b.onclick=()=>showOnMap(b.dataset.onmap,b.dataset.zone));
   if(!GF.some(p=>p.zone===zone))$('#gfplaces').innerHTML='<div class="card block"><p style="margin:0;color:var(--muted)">No hemos encontrado sitios sin gluten fiables en esta zona. Mirad las otras zonas: están a pocos minutos.</p></div>';
   $('#gfZoneTitle').textContent='Sin gluten · '+ZONES.find(z=>z[0]===zone)[1];
