@@ -1518,9 +1518,9 @@ function zDist(r){if(!zPos)return null;return Math.min(...r.stops.map(s=>distM(z
 function renderZoneMap(){const box=$('#zoneMap');if(!box)return;if(ROUTES.length<2){box.hidden=true;return}box.hidden=false;
   if(zCity!==CI.id){zCity=CI.id;if(zmap){zmap.remove();zmap=null}zLayers={};zMe=null;
     box.innerHTML=`<div class="zhead"><div><span class="eyebrow">Los barrios de ${esc(CI.name)}</span><b>¿Dónde estás y qué tienes cerca?</b></div><button class="chip" id="zLoc">${ico('locate')}Ubicarme</button></div>
-    <div class="zmapbox" id="zmapBox" aria-label="Mapa de los barrios"></div><div class="zlist" id="zList"></div><p class="fnote" id="zNote"></p>`;
+    <div class="zmapbox" id="zmapBox" aria-label="Mapa de los barrios"></div><div id="zNear"></div><div class="zlist" id="zList"></div><p class="fnote" id="zNote"></p>`;
     $('#zLoc').onclick=()=>{$('#zNote').textContent='Buscando tu ubicación…';getPos(p=>{zPos={lat:p.coords.latitude,lng:p.coords.longitude,t:Date.now()};try{sessionStorage.setItem('strollo-zpos',JSON.stringify(zPos))}catch(e){}$('#zNote').textContent='';zDraw(true)},e=>{$('#zNote').textContent=geoMsg?geoMsg(e):'No se pudo obtener tu ubicación.'})};
-    if(typeof L!=='undefined'){try{zmap=L.map('zmapBox',{zoomControl:false,attributionControl:false,rotate:false,rotateControl:false,touchRotate:false,scrollWheelZoom:false,tap:true});
+    if(typeof L!=='undefined'){try{zmap=L.map('zmapBox',{zoomControl:false,attributionControl:false,rotate:false,rotateControl:false,touchRotate:false,scrollWheelZoom:false,tap:true});zmap.setView([ROUTES[0].stops[0].lat,ROUTES[0].stops[0].lng],12);
       let zi=0,zok=0,zbad=0,zt=null;const ZP=['https://{s}.basemap.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png','https://tile.openstreetmap.org/{z}/{x}/{y}.png'];
       const zuse=()=>{if(zt)zmap.removeLayer(zt);zok=0;zbad=0;zt=L.tileLayer(ZP[zi],{maxZoom:18,subdomains:'abcd'}).addTo(zmap);zt.on('tileload',()=>zok++);zt.on('tileerror',()=>{zbad++;if(zbad>=3&&!zok&&zi<ZP.length-1){zi++;zuse()}});setTimeout(()=>{if(!zok&&zi<ZP.length-1){zi++;zuse()}},6000)};zuse();
       ROUTES.forEach((r,i)=>{const col=ZCOL[i%ZCOL.length];const all=r.stops.map(s=>[s.lat,s.lng]);const g=L.layerGroup().addTo(zmap);
@@ -1531,20 +1531,55 @@ function renderZoneMap(){const box=$('#zoneMap');if(!box)return;if(ROUTES.length
         poly.addTo(g);const c=core.getBounds?core.getBounds().getCenter():core.getLatLng();
         const lab=L.marker(c,{icon:L.divIcon({className:'zlab',html:`<span style="background:${col}">${esc(r.short)}</span>`,iconSize:null}),keyboard:false}).addTo(g);
         const go=()=>{setRoute(r.id)};poly.on('click',go);lab.on('click',go);zLayers[r.id]={poly,col}});
-      setTimeout(()=>{zmap.invalidateSize();zmap.fitBounds(L.featureGroup(Object.values(zLayers).map(x=>x.poly)).getBounds(),{padding:[18,18]})},60)}catch(e){console.error(e);$('#zmapBox').hidden=true}}
+      setTimeout(()=>{zmap.invalidateSize();zmap.fitBounds(zFitBounds(),{padding:[18,18]})},60)}catch(e){console.error(e);$('#zmapBox').hidden=true}}
     else $('#zmapBox').hidden=true;
     if(!zPos&&navigator.permissions&&navigator.permissions.query)navigator.permissions.query({name:'geolocation'}).then(q=>{if(q.state==='granted')$('#zLoc').click()}).catch(()=>{});
   }
   zDraw(false)}
+function zFitBounds(){const ids=Object.keys(zLayers);const cs=ids.map(id=>zLayers[id].poly.getBounds().getCenter());const md=k=>{const v=cs.map(c=>k?c.lng:c.lat).sort((a,b)=>a-b);return v[v.length>>1]};const m=[md(0),md(1)];
+  const keep=ids.filter((id,i)=>distM(m[0],m[1],cs[i].lat,cs[i].lng)<12000).map(id=>zLayers[id].poly);return L.featureGroup(keep.length?keep:ids.map(id=>zLayers[id].poly)).getBounds()}
 function zDraw(fit){
   Object.entries(zLayers).forEach(([id,x])=>x.poly.setStyle({weight:id===R.id?4:2,fillOpacity:id===R.id?.3:.14}));
   if(zmap&&zPos){if(!zMe)zMe=L.circleMarker([zPos.lat,zPos.lng],{radius:7,color:'#fff',weight:3,fillColor:'#2D7FF9',fillOpacity:1}).addTo(zmap);else zMe.setLatLng([zPos.lat,zPos.lng]);
-    if(fit){const b=L.featureGroup(Object.values(zLayers).map(x=>x.poly)).getBounds();const d=Math.min(...ROUTES.map(zDist));if(d<15000)b.extend([zPos.lat,zPos.lng]);zmap.fitBounds(b,{padding:[18,18]})}}
+    if(fit){const d=Math.min(...ROUTES.map(zDist));let b;
+      if(d<15000){const near=Object.values(zLayers).filter(x=>distM(zPos.lat,zPos.lng,x.poly.getBounds().getCenter().lat,x.poly.getBounds().getCenter().lng)<1500).map(x=>x.poly);
+        b=(near.length?L.featureGroup(near).getBounds():zFitBounds());b=L.latLngBounds(b.getSouthWest(),b.getNorthEast()).extend([zPos.lat,zPos.lng])}else b=zFitBounds();
+      zmap.fitBounds(b,{padding:[18,18]})}}
   const rows=ROUTES.map((r,i)=>({r,i,d:zDist(r)}));if(zPos)rows.sort((a,b)=>a.d-b.d);
   const inside=zPos&&rows[0].d<400?rows[0].r:null;
-  $('#zList').innerHTML=(inside?`<p class="zhere">${ico('pin')} Estás en <b>${esc(inside.name)}</b></p>`:'')+rows.map(({r,i,d})=>{const n=r.main.filter(s=>done.has(s.id)).length;
+  $('#zList').innerHTML=rows.map(({r,i,d})=>{const n=r.main.filter(s=>done.has(s.id)).length;
     return `<button class="zrow${r===R?' on':''}" data-z="${r.id}"><i style="background:${ZCOL[i%ZCOL.length]}"></i><span><b>${esc(r.name)}</b><small>${r.main.length} paradas · ${n}/${r.main.length} hechas${r.km?' · '+esc(r.km):''}</small></span><em>${d==null?'':zFmt(d)}</em></button>`}).join('');
-  $$('#zList [data-z]').forEach(b=>b.onclick=()=>setRoute(b.dataset.z,true))}
+  $$('#zList [data-z]').forEach(b=>b.onclick=()=>setRoute(b.dataset.z,true))
+  try{zNearby()}catch(e){console.error(e)}}
+function zNearby(){
+  const el=$('#zNear');if(!el)return;
+  if(!zPos){el.innerHTML='<p class="fnote" style="margin:4px 0 8px">Pulsa «Ubicarme» y te digo en qué barrio estás y qué monumentos y sitios sin gluten tienes más cerca.</p>';return}
+  const la=zPos.lat,lo=zPos.lng;
+  const stops=Object.values(byId).filter(s=>!s.isIntro&&!s.isMore).map(s=>({s,d:distM(la,lo,s.lat,s.lng)})).sort((a,b)=>a.d-b.d);
+  if(!stops.length){el.innerHTML='';return}
+  if(stops[0].d>25000){el.innerHTML=`<p class="zhere">${ico('pin')} Parece que no estás en ${esc(CI.name)}: la parada más cercana está ${zFmt(stops[0].d)}.</p>`;return}
+  const inside=[];let best=null,bd=1e9;
+  ZONES.forEach(z=>{const c=ZCENTER[z[0]];if(!c)return;const bx=(ZBOX[z[0]]||'').split(',').map(Number);const d=distM(la,lo,c[0],c[1]);
+    if(bx.length===4&&bx.every(isFinite)&&lo>=bx[0]&&lo<=bx[2]&&la<=bx[1]&&la>=bx[3])inside.push([z,d]);if(d<bd){bd=d;best=z}});
+  inside.sort((a,b)=>a[1]-b[1]);
+  const z=inside.length?inside[0][0]:best;
+  const head=inside.length?`Estás en la zona de <b>${esc(z[1])}</b>`:`La zona más cercana es <b>${esc(z[1])}</b> (${zFmt(bd)})`;
+  const walk=d=>{const m=Math.max(1,Math.round(d*1.25/80));return m<60?m+' min andando':''};
+  const cnt=PLACES.filter(p=>p.zone===z[0]).length;
+  const gfn=GF.filter(p=>p.ll).map(p=>({p,d:distM(la,lo,p.ll[0],p.ll[1])})).sort((a,b)=>a.d-b.d).slice(0,3);
+  el.innerHTML=`<p class="zhere">${ico('pin')} ${head}</p>
+   <p class="fnote" style="margin:2px 0 6px">Zona aproximada, calculada con tu ubicación. Las distancias son en línea recta.</p>
+   <b class="zsub" style="display:block;margin:8px 0 4px">Lo más cercano a ti</b>
+   ${stops.slice(0,5).map(({s,d})=>{const r=routeOf[s.id];const i=ROUTES.indexOf(r);return `<button class="zrow" data-nsid="${s.id}"><i style="background:${ZCOL[i%ZCOL.length]}"></i><span><b>${esc(s.name)}</b><small>${esc(r.short)}${walk(d)?' · '+walk(d):''}</small></span><em>${zFmt(d)}</em></button>`}).join('')}
+   <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
+    <button class="chip" id="zGoRoute">Ver la ruta de ${esc(z[1])}</button>
+    ${cnt?`<button class="chip" id="zGoFood">Dónde comer en ${esc(z[1])}</button>`:''}
+   </div>
+   ${gfn.length?`<b class="zsub" style="display:block;margin:8px 0 4px">Sin gluten más cerca</b>${gfn.map(({p,d})=>`<button class="zrow" data-ngf="${esc(p.q)}" data-nz="${p.zone}"><i style="background:var(--ok)"></i><span><b>${esc(p.n)}</b><small>${esc(({1:'100 % sin gluten',2:'Menú sin gluten',3:'Opciones · precaución'})[p.l]||'')}</small></span><em>${zFmt(d)}</em></button>`).join('')}`:''}`;
+  $$('#zNear [data-nsid]').forEach(b=>b.onclick=()=>{location.hash='p-'+b.dataset.nsid});
+  const gr=$('#zGoRoute');if(gr)gr.onclick=()=>{setRoute(z[0]);const h=$('#hero');if(h)h.scrollIntoView({behavior:'smooth'})};
+  const gf=$('#zGoFood');if(gf)gf.onclick=()=>{setRoute(z[0],true);location.hash='comer'};
+  $$('#zNear [data-ngf]').forEach(b=>b.onclick=()=>showOnMap(b.dataset.ngf,b.dataset.nz))}
 function renderRouteChips(){
   $('#routeChips').innerHTML=ROUTES.map(r=>{const n=r.main.filter(s=>done.has(s.id)).length;const full=r.main.length&&n===r.main.length;return `<button class="rchip${full?' done':''}" data-route="${r.id}" aria-pressed="${r===R}"${full?` aria-label="${esc(r.short)}, completada"`:''}>${ico(r.icon)}<span><b>${esc(r.short)}</b><small>${full?ico('check')+' ':''}${n}/${r.main.length}</small></span></button>`}).join('');
   $$('[data-route]').forEach(b=>b.onclick=()=>setRoute(b.dataset.route));
